@@ -1,0 +1,6 @@
+@XCan.Api_HostAddress = http://localhost:5098
+
+GET {{XCan.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
