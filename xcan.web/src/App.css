@@ -1,0 +1,131 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center; /* Căn giữa theo trục ngang */
+  align-items: center; /* Căn giữa theo trục dọc */
+}
+
+html {
+  background: rgb(171, 255, 249);
+  background: -moz-linear-gradient(
+    313deg,
+    rgba(171, 255, 249, 1) 0%,
+    rgba(86, 205, 255, 1) 100%
+  );
+  background: -webkit-linear-gradient(
+    313deg,
+    rgba(171, 255, 249, 1) 0%,
+    rgba(86, 205, 255, 1) 100%
+  );
+  background: linear-gradient(
+    313deg,
+    rgba(171, 255, 249, 1) 0%,
+    rgba(86, 205, 255, 1) 100%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#abfff9",endColorstr="#56cdff",GradientType=1);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  margin: 1.2rem;
+}
+
+.main {
+  padding: 1.2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: black;
+  box-shadow: 0px 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+/* Media query cho mobile */
+@media (max-width: 600px) {
+  .main {
+    width: 90%; /* Tùy chỉnh kích thước cho mobile */
+    height: auto;
+  }
+}
+
+/* Media query cho desktop */
+@media (min-width: 600px) {
+  .main {
+    width: 50%; /* Tùy chỉnh kích thước cho desktop */
+    height: auto;
+  }
+}
+
+.alert-animation {
+  opacity: 0; /* Bắt đầu với độ trong suốt là 0 */
+  animation: fadeIn 0.5s forwards; /* Hiệu ứng fade-in khi xuất hiện */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0; /* Bắt đầu từ trong suốt */
+  }
+  to {
+    opacity: 1; /* Kết thúc với độ trong suốt là 1 */
+  }
+}
+
+.alert-animation.fade-out {
+  animation: fadeOut 0.8s forwards; /* Hiệu ứng fade-out khi biến mất */
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1; /* Bắt đầu từ trong suốt */
+  }
+  to {
+    opacity: 0; /* Kết thúc với độ trong suốt là 0 */
+  }
+}
