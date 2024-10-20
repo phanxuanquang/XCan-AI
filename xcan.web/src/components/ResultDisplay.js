@@ -11,6 +11,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Typography,
 } from "@mui/material";
 import { ContentCopy, AutoFixHigh } from "@mui/icons-material";
 import Markdown from "markdown-to-jsx";
@@ -22,14 +23,52 @@ const ResultDisplay = ({
   ocrResult,
   handleCopyToClipboard,
   handleOcrAgain,
+  handleTranslate,
 }) => {
   const options = {
     overrides: {
       h1: {
-        component: (props) => <h1 style={{ color: "blue" }} {...props} />,
+        component: (props) => (
+          <Typography
+            variant="h4"
+            gutterBottom
+            style={{ marginBottom: 5 }}
+            {...props}
+          />
+        ),
       },
       h2: {
-        component: (props) => <h2 style={{ color: "darkgreen" }} {...props} />,
+        component: (props) => (
+          <Typography
+            variant="h5"
+            gutterBottom
+            style={{ marginBottom: 5 }}
+            {...props}
+          />
+        ),
+      },
+      h3: {
+        component: (props) => (
+          <Typography
+            variant="h6"
+            gutterBottom
+            style={{ marginBottom: 5 }}
+            {...props}
+          />
+        ),
+      },
+      p: {
+        component: (props) => (
+          <Typography
+            variant="body1"
+            style={{
+              marginBottom: "1rem",
+              lineHeight: 1.6,
+              textAlign: "justify",
+            }}
+            {...props}
+          />
+        ),
       },
       table: {
         component: (props) => (
@@ -37,10 +76,11 @@ const ResultDisplay = ({
             component={Paper}
             style={{
               marginTop: "1rem",
+              marginBottom: "1rem",
               boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <Table {...props} size="small" aria-label="a dense table">
+            <Table {...props} size="small" aria-label="customized table">
               <TableHead>
                 <TableRow>{props.children[0].props.children}</TableRow>
               </TableHead>
@@ -56,6 +96,7 @@ const ResultDisplay = ({
               background: "#f4f4f4",
               fontWeight: "bold",
               textAlign: "left",
+              padding: "12px",
             }}
             {...props}
           />
@@ -65,8 +106,9 @@ const ResultDisplay = ({
         component: (props) => (
           <TableCell
             style={{
-              transition: "background-color 0.3s",
               padding: "12px",
+              textAlign: "left",
+              transition: "background-color 0.3s",
               "&:hover": {
                 backgroundColor: "#f9f9f9",
               },
@@ -77,9 +119,18 @@ const ResultDisplay = ({
       },
       code: {
         component: ({ children, className }) => {
-          const language = className ? className.replace("language-", "") : ""; 
+          const language = className ? className.replace("language-", "") : "";
           return (
-            <SyntaxHighlighter language={language} style={solarizedlight}>
+            <SyntaxHighlighter
+              language={language}
+              style={solarizedlight}
+              customStyle={{
+                padding: "10px",
+                borderRadius: "5px",
+                backgroundColor: "#f0f0f0",
+                marginBottom: "1rem",
+              }}
+            >
               {children}
             </SyntaxHighlighter>
           );
@@ -106,14 +157,14 @@ const ResultDisplay = ({
     >
       <Grid
         style={{
-          paddingTop: 5,
+          paddingTop: 10,
           paddingLeft: 15,
           paddingRight: 15,
         }}
       >
         <Markdown options={options}>{ocrResult}</Markdown>
       </Grid>
-      <Grid style={{ textAlign: "left", padding: 10, paddingTop: 10 }}>
+      <Grid style={{ textAlign: "left", padding: 10, paddingTop: 0 }}>
         <Tooltip title="Copy" arrow>
           <IconButton
             onClick={handleCopyToClipboard}
@@ -133,9 +184,9 @@ const ResultDisplay = ({
             <AutoFixHigh fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Translate" arrow>
+        <Tooltip title="Translate into Vietnamese" arrow>
           <IconButton
-            onClick={handleOcrAgain}
+            onClick={handleTranslate}
             color="secondary"
             size="small"
             style={{ marginLeft: "0.1rem" }}

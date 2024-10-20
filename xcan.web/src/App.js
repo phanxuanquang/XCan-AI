@@ -16,7 +16,6 @@ import ResultDisplay from "./components/ResultDisplay";
 import "./App.css";
 
 const domain = process.env.REACT_APP_API_URL;
-//const domain = "https://localhost:7283";
 
 const App = () => {
   const [image, setImage] = useState(null);
@@ -86,6 +85,37 @@ const App = () => {
               "Content-Type": "application/json",
             },
             body: `"${image}"`,
+          }
+        );
+
+        const data = await apiResponse.text();
+
+        if (!apiResponse.ok) {
+          throw new Error(data);
+        }
+
+        setOcrResult(data);
+        setExpanded(false);
+      } catch (error) {
+        showSnackbar(error, "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleTranslate = async () => {
+    if (ocrResult) {
+      setLoading(true);
+      try {
+        const apiResponse = await fetch(
+          `${domain}/Main/TranslateTextToVietnamese?apiKey=${apiKey}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(ocrResult),
           }
         );
 
@@ -193,8 +223,8 @@ const App = () => {
           isApiKeyChecked={isApiKeyChecked}
         />
 
-        <Grid container spacing={2} >
-          <Grid item xs={12} >
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
             <InputSection
               image={image}
               setImage={setImage}
@@ -208,6 +238,7 @@ const App = () => {
                 ocrResult={ocrResult}
                 handleCopyToClipboard={handleCopyToClipboard}
                 handleOcrAgain={handleSubmit}
+                handleTranslate={handleTranslate}
               />
             )}
           </Grid>
