@@ -55,7 +55,7 @@ namespace XCan.Api.Controllers
 
             try
             {
-                var instruction = @"You are an AI designed for OCR. Help me to extract the text from image. Try your best to keep the format of the content as closely as the original content as possible! If you cannot find any text in the image, reponse with the ''.";
+                var instruction = @"You are an AI designed for OCR. Help me to extract the text from image. Try your best to keep the format of the content as closely as the original content as possible! In case the image contain programming code, try to understand what is its programming language to put into suitable ``` (for ex: ```html, ```cs, ```json, ect). If you cannot find any text in the image, reponse with the ''.";
                 var prompt = "This is the image for you to extract text.";
                 var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), prompt, image, false, 10);
                 return Ok(result.Trim());

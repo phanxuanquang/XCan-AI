@@ -97,7 +97,8 @@ const App = () => {
         setOcrResult(data);
         setExpanded(false);
       } catch (error) {
-        showSnackbar(error, "error");
+        console.log(error);
+        showSnackbar("Error while extracting. Please try again!", "error");
       } finally {
         setLoading(false);
       }
@@ -128,7 +129,8 @@ const App = () => {
         setOcrResult(data);
         setExpanded(false);
       } catch (error) {
-        showSnackbar(error, "error");
+        console.log(error);
+        showSnackbar("Error while translatiin. Please try again!", "error");
       } finally {
         setLoading(false);
       }
@@ -245,8 +247,12 @@ const App = () => {
         </Grid>
       </Container>
 
-      <Backdrop open={loading || isCheckingApiKey} style={{ zIndex: 1200 }}>
-        <CircularProgress color="inherit" />
+      <Backdrop
+        open={loading || isCheckingApiKey}
+        style={{ zIndex: 1200 }}
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+      >
+        <CircularProgress thickness={5} size={70} color="inherit" />
       </Backdrop>
 
       <Snackbar

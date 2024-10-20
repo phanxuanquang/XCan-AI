@@ -11,6 +11,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Button,
   Typography,
 } from "@mui/material";
 import { ContentCopy, AutoFixHigh } from "@mui/icons-material";
@@ -18,6 +19,19 @@ import Markdown from "markdown-to-jsx";
 import TranslateIcon from "@mui/icons-material/Translate";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+const CustomBlockquote = ({ children }) => (
+  <blockquote
+    style={{
+      borderLeft: "4px solid #6200ee",
+      paddingLeft: "10px",
+      color: "#555",
+      fontStyle: "italic",
+    }}
+  >
+    {children}
+  </blockquote>
+);
 
 const ResultDisplay = ({
   ocrResult,
@@ -32,7 +46,7 @@ const ResultDisplay = ({
           <Typography
             variant="h4"
             gutterBottom
-            style={{ marginBottom: 5 }}
+            style={{ marginBottom: 5, fontWeight: "bold" }}
             {...props}
           />
         ),
@@ -65,6 +79,8 @@ const ResultDisplay = ({
               marginBottom: "1rem",
               lineHeight: 1.6,
               textAlign: "justify",
+              whiteSpace: "pre-line",
+              margin: "0.5em 0",
             }}
             {...props}
           />
@@ -96,7 +112,7 @@ const ResultDisplay = ({
               background: "#f4f4f4",
               fontWeight: "bold",
               textAlign: "left",
-              padding: "12px",
+              padding: 5,
             }}
             {...props}
           />
@@ -106,7 +122,7 @@ const ResultDisplay = ({
         component: (props) => (
           <TableCell
             style={{
-              padding: "12px",
+              padding: 5,
               textAlign: "left",
               transition: "background-color 0.3s",
               "&:hover": {
@@ -119,25 +135,67 @@ const ResultDisplay = ({
       },
       code: {
         component: ({ children, className }) => {
-          const language = className ? className.replace("language-", "") : "";
+          const language = className ? className.replace("language-", "") : ""; // Lấy ngôn ngữ từ className
+          if (language) {
+            // Nếu là đoạn mã block
+            return (
+              <SyntaxHighlighter language={language} style={solarizedlight}>
+                {children}
+              </SyntaxHighlighter>
+            );
+          }
+          // Nếu là đoạn mã inline
           return (
-            <SyntaxHighlighter
-              language={language}
-              style={solarizedlight}
-              customStyle={{
-                padding: "10px",
-                borderRadius: "5px",
-                backgroundColor: "#f0f0f0",
-                marginBottom: "1rem",
+            <code
+              style={{
+                backgroundColor: "#e3e3e3",
+                padding: 3.5,
+                borderRadius: 2,
+                fontFamily: "monospace",
               }}
             >
               {children}
-            </SyntaxHighlighter>
+            </code>
           );
         },
       },
       pre: {
         component: (props) => <pre style={{ margin: 0 }} {...props} />,
+      },
+      pre: {
+        component: (props) => <pre style={{ margin: 0 }} {...props} />,
+      },
+      img: {
+        component: (props) => (
+          <img
+            style={{ maxWidth: "100%", height: "auto" }}
+            {...props}
+            alt="img"
+          />
+        ),
+      },
+      ul: {
+        component: (props) => (
+          <ul style={{ paddingLeft: 5, margin: "0.6rem 0" }} {...props} />
+        ),
+      },
+      ol: {
+        component: (props) => (
+          <ol style={{ paddingLeft: 5, margin: "0.6rem 0" }} {...props} />
+        ),
+      },
+      li: {
+        component: (props) => <li style={{ marginBottom: 3 }} {...props} />,
+      },
+      blockquote: {
+        component: CustomBlockquote,
+      },
+      button: {
+        component: (props) => (
+          <Button variant="contained" style={{ margin: 3 }} {...props}>
+            {props.children}
+          </Button>
+        ),
       },
     },
   };
