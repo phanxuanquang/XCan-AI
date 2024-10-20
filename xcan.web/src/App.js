@@ -108,11 +108,15 @@ const App = () => {
         );
 
         const data = await apiResponse.text();
+
+        if (!apiResponse.ok) {
+          throw new Error(data);
+        }
+
         setOcrResult(data);
         setExpanded(false);
       } catch (error) {
-        console.log(error);
-        showSnackbar("An error occurred during OCR processing.", "error");
+        showSnackbar(error, "error");
       } finally {
         setLoading(false);
       }
