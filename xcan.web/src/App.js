@@ -193,8 +193,8 @@ const App = () => {
           isApiKeyChecked={isApiKeyChecked}
         />
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
+        <Grid container spacing={2} >
+          <Grid item xs={12} >
             <InputSection
               image={image}
               setImage={setImage}

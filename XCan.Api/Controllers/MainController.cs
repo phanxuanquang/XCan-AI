@@ -57,7 +57,7 @@ namespace XCan.Api.Controllers
                 var instruction = @"You are an AI designed for OCR. Help me to extract the text from image. Try your best to keep the format of the content as closely as the original content as possible!";
                 var prompt = "This is the image for you to extract text.";
                 var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), prompt, image, false, 10);
-                return Ok(result.Replace("```markdown", string.Empty));
+                return Ok(result.Replace("\n", "\n\n"));
             }
             catch (Exception ex)
             {

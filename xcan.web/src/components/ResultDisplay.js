@@ -113,7 +113,7 @@ const ResultDisplay = ({
       >
         <Markdown options={options}>{ocrResult}</Markdown>
       </Grid>
-      <Grid style={{ textAlign: "left", padding: 10, paddingTop: 0 }}>
+      <Grid style={{ textAlign: "left", padding: 10, paddingTop: 10 }}>
         <Tooltip title="Copy" arrow>
           <IconButton
             onClick={handleCopyToClipboard}
