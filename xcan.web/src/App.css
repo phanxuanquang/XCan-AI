@@ -40,10 +40,9 @@ html,
 body,
 #root {
   height: 100%;
-  margin: 0;
   display: flex;
-  justify-content: center; /* Căn giữa theo trục ngang */
-  align-items: center; /* Căn giữa theo trục dọc */
+  justify-content: center; 
+  align-items: center; 
 }
 
 html {
@@ -87,45 +86,16 @@ html {
   background: white;
 }
 
-/* Media query cho mobile */
 @media (max-width: 600px) {
   .main {
-    width: 90%; /* Tùy chỉnh kích thước cho mobile */
+    width: 90%; 
     height: auto;
   }
 }
 
-/* Media query cho desktop */
 @media (min-width: 600px) {
   .main {
-    width: 50%; /* Tùy chỉnh kích thước cho desktop */
+    width: 50%; 
     height: auto;
-  }
-}
-
-.alert-animation {
-  opacity: 0; /* Bắt đầu với độ trong suốt là 0 */
-  animation: fadeIn 0.5s forwards; /* Hiệu ứng fade-in khi xuất hiện */
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0; /* Bắt đầu từ trong suốt */
-  }
-  to {
-    opacity: 1; /* Kết thúc với độ trong suốt là 1 */
-  }
-}
-
-.alert-animation.fade-out {
-  animation: fadeOut 0.8s forwards; /* Hiệu ứng fade-out khi biến mất */
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1; /* Bắt đầu từ trong suốt */
-  }
-  to {
-    opacity: 0; /* Kết thúc với độ trong suốt là 0 */
   }
 }
