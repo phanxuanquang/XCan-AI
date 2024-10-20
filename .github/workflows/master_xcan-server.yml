@@ -1,40 +1,56 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - xcan-server
+name: Backend Deployment
 
 on:
   push:
     branches:
       - master
-  workflow_dispatch:
-
+env:
+  WEBAPP_NAME: xcan-server
+  PUBLISHED_PACKAGE_PATH: XCan.Api/publish
+  CONFIGURATION: Release
+  DOTNET_VERSION: 8.0.x
+  WORKING_DIRECTORY: XCan.Api
+  
 jobs:
   build:
-    runs-on: windows-latest
-
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.WORKING_DIRECTORY }}
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+    - name: Build
+      run: dotnet build ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-restore
+
+    - name: Test
+      run: dotnet test ${{ env.WORKING_DIRECTORY }} --no-build
+
+    - name: Publish
+      run: dotnet publish ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-build --output ${{ env.PUBLISHED_PACKAGE_PATH }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: webapp
+        path: ${{ env.PUBLISHED_PACKAGE_PATH }}
 
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: build
     environment:
       name: 'Production'
@@ -44,10 +60,11 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
-          name: .net-app
-      
+          name: webapp
+          path: ${{ env.PUBLISHED_PACKAGE_PATH }}
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,11 +72,11 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E4FFC022D1894E5E84E13D203070EAC7 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_69FFD809484445A8B2F067F8E28286ED }}
 
-      - name: Deploy to Azure Web App
+      - name: Deploy to Azure
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'xcan-server'
+          app-name: ${{ env.WEBAPP_NAME }}
           slot-name: 'Production'
-          package: .
+          package: ${{ env.PUBLISHED_PACKAGE_PATH }}
           
