@@ -54,8 +54,9 @@ namespace XCan.Api.Controllers
 
             try
             {
-                var prompt = "Extract the text from the given image!";
-                return await Generator.ContentFromImage(apiKey, "You are an AI used to scan and extract the text from the input image, do not change the content or the format.", prompt, image, false, 10);
+                var instruction = System.IO.File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "SystemInstruction.txt"));
+                var prompt = "Extract text from the given image.";
+                return await Generator.ContentFromImage(apiKey, instruction.Trim(), prompt, image, false, 10);
             }
             catch (Exception ex)
             {
