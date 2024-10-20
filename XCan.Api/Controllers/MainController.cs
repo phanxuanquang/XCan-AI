@@ -1,5 +1,4 @@
-﻿using Markdig;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using XCan.GenAI;
 
 namespace XCan.Api.Controllers
