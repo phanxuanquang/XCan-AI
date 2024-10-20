@@ -16,7 +16,7 @@ import InputSection from "./components/InputSection";
 import ResultDisplay from "./components/ResultDisplay";
 import "./App.css";
 
-const domain = "https://localhost:7283";
+const domain = process.env.REACT_APP_API_URL;
 
 const App = () => {
   const [image, setImage] = useState(null);
