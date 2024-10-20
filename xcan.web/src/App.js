@@ -9,14 +9,14 @@ import {
   Typography,
   Link,
 } from "@mui/material";
-import imageCompression from "browser-image-compression";
 import { Close } from "@mui/icons-material";
 import ApiKeyDialog from "./components/ApiKeyDialog";
 import InputSection from "./components/InputSection";
 import ResultDisplay from "./components/ResultDisplay";
 import "./App.css";
 
-const domain = process.env.REACT_APP_API_URL;
+//const domain = process.env.REACT_APP_API_URL;
+const domain = "https://localhost:7283";
 
 const App = () => {
   const [image, setImage] = useState(null);
@@ -78,24 +78,6 @@ const App = () => {
     if (image) {
       setLoading(true);
       try {
-        const response = await fetch(image);
-        const blob = await response.blob();
-
-        const options = {
-          maxSizeMB: 3,
-          maxWidthOrHeight: 4000,
-          useWebWorker: true,
-        };
-
-        const compressedBlob = await imageCompression(blob, options);
-
-        const compressedImage = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(compressedBlob);
-        });
-
         const apiResponse = await fetch(
           `${domain}/Main/ExtractTextFromImage?apiKey=${apiKey}`,
           {
@@ -103,7 +85,7 @@ const App = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: `"${compressedImage}"`,
+            body: `"${image}"`,
           }
         );
 
