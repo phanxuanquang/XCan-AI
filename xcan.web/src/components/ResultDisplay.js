@@ -5,12 +5,11 @@ import {
   IconButton,
   Tooltip,
   Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  TextField,
   Paper,
+  FormControlLabel,
+  Checkbox,
   Button,
   Typography,
 } from "@mui/material";
@@ -88,21 +87,14 @@ const ResultDisplay = ({
       },
       table: {
         component: (props) => (
-          <TableContainer
+          <Table
             component={Paper}
+            size="small"
             style={{
-              marginTop: "1rem",
-              marginBottom: "1rem",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+              marginBottom: 15,
             }}
-          >
-            <Table {...props} size="small" aria-label="customized table">
-              <TableHead>
-                <TableRow>{props.children[0].props.children}</TableRow>
-              </TableHead>
-              <TableBody>{props.children.slice(1)}</TableBody>
-            </Table>
-          </TableContainer>
+            {...props}
+          />
         ),
       },
       th: {
@@ -135,16 +127,14 @@ const ResultDisplay = ({
       },
       code: {
         component: ({ children, className }) => {
-          const language = className ? className.replace("language-", "") : ""; 
+          const language = className ? className.replace("language-", "") : "";
           if (language) {
-            // Nếu là đoạn mã block
             return (
               <SyntaxHighlighter language={language} style={solarizedlight}>
                 {children}
               </SyntaxHighlighter>
             );
           }
-          // Nếu là đoạn mã inline
           return (
             <code
               style={{
@@ -162,8 +152,35 @@ const ResultDisplay = ({
       pre: {
         component: (props) => <pre style={{ margin: 0 }} {...props} />,
       },
-      pre: {
-        component: (props) => <pre style={{ margin: 0 }} {...props} />,
+      input: {
+        component: (props) => {
+          if (props.type === "checkbox") {
+            return (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    color="primary"
+                    size="small"
+                    checked={props.checked}
+                  />
+                }
+                label=""
+                style={{ margin: 10 }}
+              />
+            );
+          }
+
+          if (props.type === "text") {
+            return (
+              <TextField
+                size="small"
+                variant="outlined"
+                style={{ marginRight: 5 }}
+                {...props}
+              />
+            );
+          }
+        },
       },
       img: {
         component: (props) => (
@@ -176,12 +193,12 @@ const ResultDisplay = ({
       },
       ul: {
         component: (props) => (
-          <ul style={{ paddingLeft: 5, margin: "0.6rem 0" }} {...props} />
+          <ul style={{ paddingLeft: 5, marginLeft: 30 }} {...props} />
         ),
       },
       ol: {
         component: (props) => (
-          <ol style={{ paddingLeft: 5, margin: "0.6rem 0" }} {...props} />
+          <ol style={{ paddingLeft: 5, marginLeft: 30 }} {...props} />
         ),
       },
       li: {
@@ -192,7 +209,12 @@ const ResultDisplay = ({
       },
       button: {
         component: (props) => (
-          <Button variant="contained" style={{ margin: 3 }} {...props}>
+          <Button
+            variant="contained"
+            size="small"
+            style={{ margin: 3, boxShadow: "none" }}
+            {...props}
+          >
             {props.children}
           </Button>
         ),
