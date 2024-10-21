@@ -135,7 +135,7 @@ const ResultDisplay = ({
       },
       code: {
         component: ({ children, className }) => {
-          const language = className ? className.replace("language-", "") : ""; // Lấy ngôn ngữ từ className
+          const language = className ? className.replace("language-", "") : ""; 
           if (language) {
             // Nếu là đoạn mã block
             return (

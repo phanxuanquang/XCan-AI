@@ -55,7 +55,7 @@ namespace XCan.Api.Controllers
 
             try
             {
-                var instruction = @"You are an AI designed for OCR. Help me to extract the text from image. Try your best to keep the format of the content as closely as the original content as possible! In case the image contain programming code, try to understand what is its programming language to put into suitable ``` (for ex: ```html, ```cs, ```json, ect). If you cannot find any text in the image, reponse with the ''.";
+                var instruction = @"You are an AI designed for OCR. Help me to extract the text from image. In case the image contain programming code, try to understand what is its programming language to put into suitable ``` (for ex: ```html, ```cs, ```json, ect). Try your best to keep the format of the content as closely as the original content as possible! If you cannot find any text in the image, reponse with the 'Text Not Found'.";
                 var prompt = "This is the image for you to extract text.";
                 var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), prompt, image, false, 10);
                 return Ok(result.Trim());
@@ -81,7 +81,7 @@ namespace XCan.Api.Controllers
 
             try
             {
-                var instruction = "You are a translator with over 30 years of experience from any languages to Vietnamese. You have to help me to translate the provided text from its original language into Vietnamese. Ensure that the translation is accurate, maintaining the original meaning, tone, and structure without adding or removing any information. Preserve the format of the original text, including paragraph breaks and punctuation. Do not alter the content or provide explanations or comments, and only provide me the Vietnamese translation.";
+                var instruction = "You are a translator with over 30 years of experience from any languages to Vietnamese. You have to help me to translate the provided text from its original language into Vietnamese. Ensure that the translation is **accurate, maintaining the original meaning, tone, and structure** without adding or removing any information. Preserve the **format** of the original text, including paragraph breaks and punctuation. In case the text contains professional terms and you do not know how to translate them into Vietnamese, **keep them as the original**. **Do not** alter the content or provide extra explanations or comments, only provide me the coresponding Vietnamese translation.";
                 var result = await Generator.ContentFromText(apiKey, instruction.Trim(), content, false, 50);
                 return Ok(result.Trim());
             }

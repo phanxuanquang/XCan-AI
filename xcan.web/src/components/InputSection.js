@@ -21,7 +21,7 @@ const InputSection = ({
 }) => {
   const sampleImage = "https://i.imgur.com/jHKXjqD.jpeg";
   const uploadBoxRef = useRef(null);
-  const fileInputRef = useRef(null); 
+  const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handlePaste = (event) => {
@@ -84,7 +84,7 @@ const InputSection = ({
       }}
     >
       <AccordionSummary expandIcon={!ocrResult && <ExpandMore />}>
-        <Typography style={{fontWeight: "bold"}}>Get Started</Typography>
+        <Typography style={{ fontWeight: "bold" }}>Get Started</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={2} justifyContent="center">
@@ -94,9 +94,9 @@ const InputSection = ({
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
-              onClick={image ? handleImageClick : null}
+              onClick={handleImageClick}
               style={{
-                border: isDragging ? "2px solid #00f" : "2px dashed #ccc", 
+                border: isDragging ? "2px solid #00f" : "2px dashed #ccc",
                 borderRadius: 10,
                 padding: 5,
                 width: "95%",
@@ -147,7 +147,7 @@ const InputSection = ({
             <input
               ref={fileInputRef}
               accept="image/*"
-              capture="environment" 
+              capture="environment"
               style={{ display: "none" }}
               id="file-upload"
               type="file"
