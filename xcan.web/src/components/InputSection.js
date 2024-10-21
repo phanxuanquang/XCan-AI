@@ -19,7 +19,7 @@ const InputSection = ({
   setExpanded,
   ocrResult,
 }) => {
-  const sampleImage = "https://placehold.co/600x400";
+  const sampleImage = "https://i.imgur.com/jHKXjqD.jpeg";
   const uploadBoxRef = useRef(null);
   const fileInputRef = useRef(null); 
   const [isDragging, setIsDragging] = useState(false);
