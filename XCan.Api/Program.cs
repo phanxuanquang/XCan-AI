@@ -56,9 +56,10 @@ namespace XCan.Api
                 options.AddDefaultPolicy(policyBuilder =>
                 {
                     policyBuilder
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                        .WithOrigins("https://xcan-ai.vercel.app")
+                        //.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
             });
 

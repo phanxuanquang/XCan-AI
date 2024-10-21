@@ -22,15 +22,15 @@ const App = () => {
   const [ocrResult, setOcrResult] = useState(null);
   const [openApiKeyDialog, setOpenApiKeyDialog] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [isCheckingApiKey, setIsCheckingApiKey] = useState(false);
+  const [isApiKeyChecked, setIsApiKeyChecked] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "error",
   });
-  const [apiKey, setApiKey] = useState("");
-  const [isCheckingApiKey, setIsCheckingApiKey] = useState(false);
-  const [isApiKeyChecked, setIsApiKeyChecked] = useState(false);
-  const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
     const storedApiKey = localStorage.getItem("apiKey");
@@ -88,11 +88,11 @@ const App = () => {
           }
         );
 
-        const data = await apiResponse.text();
-
         if (!apiResponse.ok) {
-          throw new Error(data);
+          throw new Error(await apiResponse.text());
         }
+
+        const data = await apiResponse.text();
 
         setOcrResult(data);
         setExpanded(false);
@@ -108,6 +108,10 @@ const App = () => {
   const handleTranslate = async () => {
     if (ocrResult) {
       setLoading(true);
+      const requestBody = {
+        extractedContent: ocrResult,
+        base64Img: image,
+      };
       try {
         const apiResponse = await fetch(
           `${domain}/Main/TranslateTextToVietnamese?apiKey=${apiKey}`,
@@ -116,15 +120,15 @@ const App = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(ocrResult),
+            body: JSON.stringify(requestBody),
           }
         );
 
-        const data = await apiResponse.text();
-
         if (!apiResponse.ok) {
-          throw new Error(data);
+          throw new Error(await apiResponse.text());
         }
+
+        const data = await apiResponse.text();
 
         setOcrResult(data);
         setExpanded(false);

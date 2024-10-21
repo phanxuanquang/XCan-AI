@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using XCan.Api.DTO;
 using XCan.GenAI;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace XCan.Api.Controllers
 {
@@ -67,22 +69,36 @@ namespace XCan.Api.Controllers
         }
 
         [HttpPost("TranslateTextToVietnamese")]
-        public async Task<ActionResult<string>> TranslateTextToVietnamese([FromBody] string content, string apiKey)
+        public async Task<ActionResult<string>> TranslateTextToVietnamese([FromBody] RequestTranslationDTO content, string apiKey)
         {
             if (string.IsNullOrEmpty(apiKey))
             {
                 return BadRequest("Gemini API Key Not Found");
             }
 
-            if (string.IsNullOrEmpty(content))
+            if (string.IsNullOrEmpty(content.ExtractedContent))
             {
                 return BadRequest("Content to Translate Not Found");
             }
 
+            if (string.IsNullOrEmpty(content.Base64Img))
+            {
+                return BadRequest("Image Not Found");
+            }
+
             try
             {
-                var instruction = "You are a translator with over 30 years of experience from any languages to Vietnamese. You have to help me to translate the provided text from its original language into Vietnamese. Ensure that the translation is **accurate, maintaining the original meaning, tone, and structure** without adding or removing any information. Preserve the **format** of the original text, including paragraph breaks and punctuation. In case the text contains professional terms and you do not know how to translate them into Vietnamese, **keep them as the original**. **Do not** alter the content or provide extra explanations or comments, only provide me the coresponding Vietnamese translation.";
-                var result = await Generator.ContentFromText(apiKey, instruction.Trim(), content, false, 50);
+                var instruction = "You are a translator with over 30 years of experience from any languages to Vietnamese. You have to help me to translate the provided text from its original language into Vietnamese. You should also check the provided image that contains the text, it may be helpful for you to understand the context of the text. Ensure that the translation is **accurate (following the context in the provided image), maintaining the original meaning, tone, and structure** without adding or removing any information. Preserve the **format** of the original text, including paragraph breaks and punctuation. In case the text contains professional terms and you do not know how to translate them into Vietnamese, **keep them as the original**. **Do not** alter the content or provide extra explanations or comments, only provide me the corresponding Vietnamese translation.";
+
+                var image = content.Base64Img
+                    .Replace("data:image/png;base64,", string.Empty)
+                    .Replace("data:image/jpeg;base64,", string.Empty)
+                    .Replace("data:image/heic;base64,", string.Empty)
+                    .Replace("data:image/heif;base64,", string.Empty)
+                    .Replace("data:image/webp;base64,", string.Empty)
+                    .Trim();
+
+                var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), content.ExtractedContent.Trim(), image, false, 50);
                 return Ok(result.Trim());
             }
             catch (Exception ex)
