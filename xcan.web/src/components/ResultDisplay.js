@@ -77,7 +77,6 @@ const ResultDisplay = ({
             style={{
               marginBottom: "1rem",
               lineHeight: 1.6,
-              textAlign: "justify",
               whiteSpace: "pre-line",
               margin: "0.5em 0",
             }}
@@ -103,7 +102,6 @@ const ResultDisplay = ({
             style={{
               background: "#f4f4f4",
               fontWeight: "bold",
-              textAlign: "left",
               padding: 5,
             }}
             {...props}
@@ -139,7 +137,7 @@ const ResultDisplay = ({
             <code
               style={{
                 backgroundColor: "#e3e3e3",
-                padding: 3.5,
+                margin: 5,
                 borderRadius: 2,
                 fontFamily: "monospace",
               }}
@@ -240,6 +238,8 @@ const ResultDisplay = ({
           paddingTop: 10,
           paddingLeft: 15,
           paddingRight: 15,
+
+          overflowX: "auto",
         }}
       >
         <Markdown options={options}>{ocrResult}</Markdown>

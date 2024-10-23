@@ -48,23 +48,17 @@ const App = () => {
         const response = await fetch(
           `${domain}/Main/ValidateApiKey?apiKey=${apiKey}`
         );
-        if (response.status === 200) {
-          localStorage.setItem("apiKey", apiKey);
-          setOpenApiKeyDialog(false);
-          setIsApiKeyChecked(true);
-        } else if (response.status === 401) {
-          showSnackbar(await response.text(), "error");
-        } else {
-          showSnackbar(
-            "An error occurred while validating the API Key.",
-            "error"
-          );
+
+        if (!response.ok) {
+          throw new Error(await response.text());
         }
+
+        localStorage.setItem("apiKey", apiKey);
+        setOpenApiKeyDialog(false);
+        setIsApiKeyChecked(true);
       } catch (error) {
-        showSnackbar(
-          "An error occurred while validating the API Key.",
-          "error"
-        );
+        console.log(error);
+        showSnackbar(error.message, "error");
       } finally {
         setIsCheckingApiKey(false);
       }
@@ -98,7 +92,7 @@ const App = () => {
         setExpanded(false);
       } catch (error) {
         console.log(error);
-        showSnackbar("Error while extracting. Please try again!", "error");
+        showSnackbar(error.message, "error");
       } finally {
         setLoading(false);
       }
@@ -134,7 +128,7 @@ const App = () => {
         setExpanded(false);
       } catch (error) {
         console.log(error);
-        showSnackbar("Error while translatiin. Please try again!", "error");
+        showSnackbar(error.message, "error");
       } finally {
         setLoading(false);
       }
@@ -152,7 +146,7 @@ const App = () => {
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(ocrResult);
-    showSnackbar("Copied to clipboard!", "success");
+    showSnackbar("Copied", "success");
   };
 
   const showSnackbar = (message, severity) => {
@@ -214,7 +208,6 @@ const App = () => {
               >
                 GitHub repository
               </Link>
-              .
             </Typography>
           </Grid>
         </Grid>
