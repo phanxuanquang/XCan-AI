@@ -57,7 +57,7 @@ namespace XCan.Api.Controllers
 
             try
             {
-                var instruction = @"You are an AI designed for OCR. Help me to extract the text from image. In case the image contain programming code, try to understand what is its programming language to put into suitable ``` (for ex: ```html, ```cs, ```json, ect). Try your best to keep the format of the content as closely as the original content as possible! If you cannot find any text in the image, reponse with the 'Text Not Found'.";
+                var instruction = @"You are an AI designed especially to extract the text from image. Ensure that the output is **as accurate as possible"", and maintaining the structure without adding or removing any information. Try you best to preserve the **format** of the original text (using Markdown syntax if needed), including paragraph breaks and punctuation, tables, programming code, etc.  If you cannot find any text in the image, response with the 'Text Not Found'.";
                 var prompt = "This is the image for you to extract text.";
                 var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), prompt, image, false, 10);
                 return Ok(result.Trim());
