@@ -57,7 +57,7 @@ namespace XCan.Api.Controllers
 
             try
             {
-                var instruction = @"You are an AI designed especially to extract the text from image. Ensure that the output is **as accurate as possible**, and maintaining the **content structure/formart** without adding or removing any information. Try you best to reproduce the **format** of the original text format (such as paragraph breaks and punctuation, tables, programming code, etc), I think Markdown syntax and HTML code can be very helpful for you to reproduce the format of the original text effectively, try leverage them if needed. If you cannot detect any text in the image, response with the 'Text Not Found'. ";
+                var instruction = @"You are an AI designed especially to extract the text from image. Ensure that the output is **as accurate as possible**, and maintaining the **content structure/formart** without adding or removing any information. Try you best to reproduce the **format** of the original text format (such as paragraph breaks and punctuation, tables, programming code, etc). If Markdown syntax is not enough to help you repoduce the format of the orginal text, you can use it with HTML code also. If you cannot detect any text in the image, response with the 'Text Not Found'. ";
                 var prompt = "This is the image for you to extract text.";
                 var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), prompt, image, false, 10);
                 return Ok(result.Trim());
