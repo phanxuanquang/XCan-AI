@@ -2,4 +2,4 @@
 ------------
 An Generative AI-based web application that is used to OCR/extract the text from any images without changing the format of the text
 
-*Comming soon . . .*
+*Coming soon . . .*
