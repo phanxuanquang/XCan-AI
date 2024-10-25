@@ -6,10 +6,7 @@ import {
   Tooltip,
   Table,
   TableCell,
-  TextField,
   Paper,
-  FormControlLabel,
-  Checkbox,
   Button,
   Typography,
 } from "@mui/material";
@@ -18,6 +15,7 @@ import Markdown from "markdown-to-jsx";
 import TranslateIcon from "@mui/icons-material/Translate";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { MathJax, MathJaxContext } from "better-react-mathjax"; // Thêm thư viện MathJax
 
 const CustomBlockquote = ({ children }) => (
   <blockquote
@@ -91,6 +89,7 @@ const ResultDisplay = ({
             size="small"
             style={{
               marginBottom: 15,
+              overflow: "auto", // Cho phép bảng cuộn ngang nếu quá rộng
             }}
             {...props}
           />
@@ -103,6 +102,7 @@ const ResultDisplay = ({
               background: "#f4f4f4",
               fontWeight: "bold",
               padding: 5,
+              textAlign: "center", // Căn giữa cho tiêu đề bảng
             }}
             {...props}
           />
@@ -138,6 +138,7 @@ const ResultDisplay = ({
               style={{
                 backgroundColor: "#e3e3e3",
                 margin: 5,
+                padding: 2,
                 borderRadius: 2,
                 fontFamily: "monospace",
               }}
@@ -150,35 +151,21 @@ const ResultDisplay = ({
       pre: {
         component: (props) => <pre style={{ margin: 0 }} {...props} />,
       },
-      input: {
-        component: (props) => {
-          if (props.type === "checkbox") {
-            return (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    color="primary"
-                    size="small"
-                    checked={props.checked}
-                  />
-                }
-                label=""
-                style={{ margin: 10 }}
-              />
-            );
-          }
-
-          if (props.type === "text") {
-            return (
-              <TextField
-                size="small"
-                variant="outlined"
-                style={{ marginRight: 5 }}
-                {...props}
-              />
-            );
-          }
-        },
+      sup: {
+        component: (props) => (
+          <sup
+            style={{ verticalAlign: "super", fontSize: "smaller" }}
+            {...props}
+          />
+        ),
+      },
+      sub: {
+        component: (props) => (
+          <sub
+            style={{ verticalAlign: "sub", fontSize: "smaller" }}
+            {...props}
+          />
+        ),
       },
       img: {
         component: (props) => (
@@ -217,6 +204,15 @@ const ResultDisplay = ({
           </Button>
         ),
       },
+      math: {
+        component: ({ children }) => (
+          <MathJaxContext>
+            <MathJax inline dynamic>
+              {children}
+            </MathJax>
+          </MathJaxContext>
+        ),
+      },
     },
   };
 
@@ -238,7 +234,6 @@ const ResultDisplay = ({
           paddingTop: 10,
           paddingLeft: 15,
           paddingRight: 15,
-
           overflowX: "auto",
         }}
       >

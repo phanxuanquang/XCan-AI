@@ -100,7 +100,7 @@ const InputSection = ({
                 borderRadius: 10,
                 padding: 5,
                 width: "95%",
-                height: "30rem",
+                height: "50vh",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -160,7 +160,7 @@ const InputSection = ({
               <label htmlFor="file-upload">
                 <Button
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                   component="span"
                   startIcon={<PhotoCamera />}
                   style={{
