@@ -128,7 +128,15 @@ const ResultDisplay = ({
           const language = className ? className.replace("language-", "") : "";
           if (language) {
             return (
-              <SyntaxHighlighter language={language} style={solarizedlight}>
+              <SyntaxHighlighter
+                language={language}
+                style={solarizedlight}
+                customStyle={{
+                  backgroundColor: "#e3e3e3",  
+                  overflowX: "auto", 
+                  borderRadius: 4,
+                }}
+              >
                 {children}
               </SyntaxHighlighter>
             );
@@ -137,8 +145,9 @@ const ResultDisplay = ({
             <code
               style={{
                 backgroundColor: "#e3e3e3",
-                margin: 5,
                 padding: 2,
+                paddingLeft: 3,
+                paddingRight: 3,
                 borderRadius: 2,
                 fontFamily: "monospace",
               }}
