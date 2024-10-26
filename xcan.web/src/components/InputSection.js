@@ -147,7 +147,7 @@ const InputSection = ({
             <input
               ref={fileInputRef}
               accept="image/*"
-              capture="environment"
+           
               style={{ display: "none" }}
               id="file-upload"
               type="file"
