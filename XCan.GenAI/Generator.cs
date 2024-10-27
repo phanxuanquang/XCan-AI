@@ -5,7 +5,9 @@ namespace XCan.GenAI
 {
     public static class Generator
     {
-        private static readonly HttpClient Client = new HttpClient();
+        private const int ValidApiKeyLenght = 39;
+        private const string ApiKeyPrefix = "AIzaSy";
+        private static readonly HttpClient Client = new();
 
         public static async Task<string> ContentFromText(string apiKey, string? instruction, string query, bool useJson = true, double creativeLevel = 50)
         {
@@ -157,6 +159,36 @@ namespace XCan.GenAI
             var responseDTO = JsonConvert.DeserializeObject<ModelResponseDTO.Response>(responseData);
 
             return responseDTO.Candidates[0].Content.Parts[0].Text;
+        }
+
+        public static bool CanBeGeminiApiKey(string apiKey)
+        {
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                return false;
+            }
+
+            apiKey = apiKey.Trim();
+
+            return apiKey.Length == ValidApiKeyLenght && (apiKey.StartsWith(ApiKeyPrefix) || ApiKeyPrefix.StartsWith(apiKey));
+        }
+
+        public static async Task<bool> IsValidApiKey(string apiKey)
+        {
+            if (CanBeGeminiApiKey(apiKey))
+            {
+                try
+                {
+                    await ContentFromText(apiKey.Trim(), "You are my helpful AI assistant", "Print 'I am an AI'.", false, 10);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            return false;
         }
     }
 }
