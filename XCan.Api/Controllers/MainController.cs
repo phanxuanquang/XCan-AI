@@ -25,7 +25,7 @@ namespace XCan.Api.Controllers
         [HttpPost("ExtractTextFromImage")]
         public async Task<ActionResult<string>> ExtractTextFromImage([FromBody] string image, string apiKey)
         {
-            if (Generator.CanBeGeminiApiKey(apiKey))
+            if (!Generator.CanBeGeminiApiKey(apiKey))
             {
                 return BadRequest("Invalid Gemini API Key");
             }
@@ -121,7 +121,7 @@ You are a superior AI designed specially for extracting text from the image that
         [HttpPost("TranslateTextToVietnamese")]
         public async Task<ActionResult<string>> TranslateTextToVietnamese([FromBody] RequestTranslationDTO content, string apiKey)
         {
-            if (Generator.CanBeGeminiApiKey(apiKey))
+            if (!Generator.CanBeGeminiApiKey(apiKey))
             {
                 return BadRequest("Invalid Gemini API Key");
             }

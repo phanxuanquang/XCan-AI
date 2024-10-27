@@ -53,7 +53,7 @@ const ResultDisplay = ({
           <Typography
             variant="h5"
             gutterBottom
-            style={{ marginBottom: 5 }}
+            style={{ marginBottom: 5, fontWeight: "bold" }}
             {...props}
           />
         ),
@@ -63,7 +63,7 @@ const ResultDisplay = ({
           <Typography
             variant="h6"
             gutterBottom
-            style={{ marginBottom: 5 }}
+            style={{ marginBottom: 5, fontWeight: "bold" }}
             {...props}
           />
         ),
@@ -88,8 +88,9 @@ const ResultDisplay = ({
             component={Paper}
             size="small"
             style={{
+              marginTop: 10,
               marginBottom: 15,
-              overflow: "auto", // Cho phép bảng cuộn ngang nếu quá rộng
+              overflow: "auto",
             }}
             {...props}
           />
@@ -99,10 +100,9 @@ const ResultDisplay = ({
         component: (props) => (
           <TableCell
             style={{
-              background: "#f4f4f4",
+              background: "#e7e9eb",
               fontWeight: "bold",
               padding: 5,
-              textAlign: "center", // Căn giữa cho tiêu đề bảng
             }}
             {...props}
           />
@@ -132,9 +132,13 @@ const ResultDisplay = ({
                 language={language}
                 style={solarizedlight}
                 customStyle={{
-                  backgroundColor: "#e3e3e3",  
-                  overflowX: "auto", 
+                  backgroundColor: "#e3e3e3",
+                  overflowX: "auto",
                   borderRadius: 4,
+                  transition: "background-color 0.4s",
+                  "&:hover": {
+                    backgroundColor: "#e0d2cc",
+                  },
                 }}
               >
                 {children}
