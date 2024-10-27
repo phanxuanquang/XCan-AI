@@ -1,4 +1,6 @@
-html, body, #root {
+html,
+body,
+#root {
   min-height: 100%;
   height: auto;
   display: flex;
@@ -7,12 +9,22 @@ html, body, #root {
   align-items: center;
 }
 
-html {
-  background: linear-gradient(
-    313deg,
-    rgba(171, 255, 249, 1) 0%,
-    rgba(86, 205, 255, 1) 100%
-  );
+body {
+  background: linear-gradient(143deg, #4158d0, #c850c0, #ffcc70, #4bfcff);
+  background-size: 400% 400%;
+  animation: gradient 8s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .App {
@@ -20,7 +32,7 @@ html {
   flex-direction: column;
   flex-grow: 1;
   width: 100vw;
-  overflow: auto; 
+  overflow: auto;
 }
 
 .container {
@@ -29,7 +41,7 @@ html {
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 100vh; 
+  min-height: 100vh;
   margin: 1.2rem;
   width: 100vw;
 }

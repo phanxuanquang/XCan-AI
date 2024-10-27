@@ -147,7 +147,7 @@ const InputSection = ({
             <input
               ref={fileInputRef}
               accept="image/*"
-              capture 
+              capture
               style={{ display: "none" }}
               id="file-upload"
               type="file"
@@ -160,12 +160,21 @@ const InputSection = ({
               <label htmlFor="file-upload">
                 <Button
                   variant="contained"
-                  color="secondary"
                   component="span"
                   startIcon={<PhotoCamera />}
                   style={{
                     border: "none",
                     boxShadow: "none",
+
+                    transition: "background 0.5s ease, transform 0.5s ease",
+                    background: "linear-gradient(45deg, #9e05f7, #f705cb)",
+                  }}
+                  size="large"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
                   }}
                 >
                   Take a Photo
