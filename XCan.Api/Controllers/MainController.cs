@@ -110,6 +110,11 @@ You are a superior AI designed specially for extracting text from the image that
 - Response with the 'Text Not Found' if you can't find any text in the image that I provide.";
                 var prompt = "This is the image for you to extract text.";
                 var result = await Generator.ContentFromImage(apiKey, instruction, prompt, image, false, 20);
+                if (result.StartsWith("```") && result.EndsWith("```"))
+                {
+                    var lines = result.Split(Environment.NewLine);
+                    result = string.Join(Environment.NewLine, lines.Skip(1).Take(lines.Length - 2));
+                }
                 return Ok(result.Trim());
             }
             catch (Exception ex)
@@ -149,6 +154,12 @@ You are a superior AI designed specially for extracting text from the image that
                     .Trim();
 
                 var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), content.ExtractedContent.Trim(), image, false, 50);
+                if (result.StartsWith("```") && result.EndsWith("```"))
+                {
+                    var lines = result.Split(Environment.NewLine);
+                    result = string.Join(Environment.NewLine, lines.Skip(1).Take(lines.Length - 2));
+                }
+
                 return Ok(result.Trim());
             }
             catch (Exception ex)
