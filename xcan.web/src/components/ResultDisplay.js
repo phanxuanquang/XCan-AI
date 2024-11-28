@@ -76,7 +76,7 @@ const ResultDisplay = ({
               marginBottom: "1rem",
               lineHeight: 1.6,
               whiteSpace: "pre-line",
-              margin: "0.5em 0",
+              marginBottom: 5,
             }}
             {...props}
           />
