@@ -44,7 +44,7 @@ jobs:
       run: dotnet publish ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-build --output ${{ env.PUBLISHED_PACKAGE_PATH }}
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: webapp
         path: ${{ env.PUBLISHED_PACKAGE_PATH }}
@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: webapp
           path: ${{ env.PUBLISHED_PACKAGE_PATH }}
