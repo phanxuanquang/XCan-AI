@@ -151,6 +151,23 @@ You are a superior AI designed specially for extracting text from the image that
 
                 var result = await Generator.ContentFromImage(apiKey, instruction.Trim(), content.ExtractedContent.Trim(), image, false, 50);
 
+                if (result.StartsWith("```"))
+                {
+                    var lines = result.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
+                
+                    if (lines.Count >= 3)
+                    {
+                        lines.RemoveAt(0); // Xóa dòng đầu tiên
+                        lines.RemoveAt(lines.Count - 1); // Xóa dòng cuối cùng
+                
+                        result = string.Join("\n", lines); // Gán lại kết quả cho biến result
+                    }
+                    else
+                    {
+                        result = string.Empty; // Nếu không đủ dòng, trả về chuỗi rỗng hoặc giữ nguyên tuỳ mục đích
+                    }
+                }
+
                 return Ok(result.Trim());
             }
             catch (Exception ex)
