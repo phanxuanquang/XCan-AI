@@ -30,7 +30,7 @@ The users just input the image by pasting (`Ctrl + V`) or select the image from 
     ```
 
 2. **Backend Setup**:
-- In Visual Studio Code:
+- In Visual Studio Code: 
     - Navigate to the `XCan.Api` directory:
         ```sh
         cd XCan.Api
