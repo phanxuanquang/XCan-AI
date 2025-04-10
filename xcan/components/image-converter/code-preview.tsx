@@ -82,7 +82,7 @@ export function CodePreview({
   }, [isEditing]);
 
   return (
-    <div className="relative h-full flex flex-col rounded-xl overflow-hidden border border-border">
+    <div className="relative h-full flex flex-col rounded-lg overflow-hidden border border-border">
       <div className="flex items-center justify-between bg-muted px-4 py-1 border-b border-border">
         <div className="flex items-center gap-2 text-muted-foreground">
           <span className="text-xs font-medium">HTML</span>
@@ -157,7 +157,7 @@ export function CodePreview({
             <textarea
               value={editableCode}
               onChange={handleCodeChange}
-              className="w-full h-full border-0 outline-none resize-none bg-[#1e1e1e] text-[#d4d4d4] font-mono text-md whitespace-pre-wrap"
+              className="w-full h-full border-0 outline-none resize-none bg-[#1e1e1e] text-[#d4d4d4] font-mono text-md whitespace-pre-wrap overflow-hidden"
               spellCheck="false"
               autoFocus
             />
