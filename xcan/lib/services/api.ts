@@ -48,7 +48,7 @@ export async function generateHtmlFromImage(
     
     // If not in local storage, fetch from GitHub and save it
     if (!systemInstruction) {
-      const systemInstructionResponse = await fetch('https://raw.githubusercontent.com/phanxuanquang/XCan-AI/refs/heads/master/System%20Instruction.md');
+      const systemInstructionResponse = await fetch('https://raw.githubusercontent.com/phanxuanquang/XCan-AI/refs/heads/master/xcan/lib/services/System%20Instruction.md');
       systemInstruction = await systemInstructionResponse.text();
       
       // Save to local storage for future use
