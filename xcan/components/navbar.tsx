@@ -10,7 +10,7 @@ import { Github } from 'lucide-react';
 export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div className="container flex items-center justify-between h-16 px-4 md:px-6 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between h-16 px-4 md:px-6 mx-auto">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
