@@ -8,12 +8,14 @@ const GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 export const API_KEY_STORAGE_KEY = "xcan_api_key";
 export const SYSTEM_INSTRUCTION_STORAGE_KEY = "system_instruction";
 
+const MODEL_ID = "gemini-3.1-flash-lite"; 
+
 // Function to validate API key
 export async function validateApiKey(apiKey: string): Promise<boolean> {
   try {
     // Use a simple generation request to validate the API key
     const response = await axios.post(
-      `${GEMINI_API_BASE_URL}/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
+      `${GEMINI_API_BASE_URL}/models/${MODEL_ID}:generateContent?key=${apiKey}`,
       {
         contents: [
           {
@@ -38,7 +40,7 @@ export async function validateApiKey(apiKey: string): Promise<boolean> {
 // Function to generate HTML/Tailwind from an image
 export async function generateHtmlFromImage(
   apiKey: string,
-  imageBase64: string
+  imageBase64: string 
 ): Promise<{ success: boolean; data?: string; error?: string }> {
   try {
     const prompt = `Use the provided image as the sole visual reference. You have to replicate every visual detail using Tailwind CSS. Only return the HTML and Tailwind CSS code without any explanations or extra comments. Ensure the HTML is properly structured and semantic and must follow the provided output template strictly.`;
@@ -187,7 +189,7 @@ A single \`.html\` file containing:
 `;
 
     const response = await axios.post(
-      `${GEMINI_API_BASE_URL}/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `${GEMINI_API_BASE_URL}/models/${MODEL_ID}:generateContent?key=${apiKey}`,
       {
         systemInstruction: {
           parts: [
@@ -212,10 +214,10 @@ A single \`.html\` file containing:
           },
         ],
         generationConfig: {
-          temperature: 0.1,
-          topK: 16,
-          topP: 0.95,
-          maxOutputTokens: 8192,
+          temperature: 0.4,
+          thinkingConfig : {
+            thinkingLevel: "MEDIUM"
+          }
         },
       }
     );

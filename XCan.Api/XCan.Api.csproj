@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,11 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\XCan.GenAI\XCan.GenAI.csproj" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.14.14" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.27" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XCan.Core\XCan.Core.csproj" />
   </ItemGroup>
 
 </Project>
