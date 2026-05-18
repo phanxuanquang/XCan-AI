@@ -5,7 +5,7 @@ import axios from "axios";
 const GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 
 // Storage keys
-export const API_KEY_STORAGE_KEY = "xcan_api_key";
+export const API_KEY_STORAGE_KEY = "gemini_api_key";
 export const SYSTEM_INSTRUCTION_STORAGE_KEY = "system_instruction";
 
 const MODEL_ID = "gemini-3.1-flash-lite"; 
