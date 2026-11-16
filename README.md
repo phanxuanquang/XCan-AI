@@ -1,4 +1,4 @@
-# XCan
+# © 2026 Phan Xuan Quang / XCan
 
 Extract the text from any image (screenshot, scan, photo, handwriting), right in your browser. The layout comes out as Markdown you can edit, translate and copy.
 
@@ -20,7 +20,6 @@ Extract the text from any image (screenshot, scan, photo, handwriting), right in
 - Keeps visible formatting: headings, emphasis, lists, task lists, tables, code, quotes, links.
 - Translate the result into another language (source language detected), on device.
 - Copy the Markdown to the clipboard.
-- Light and dark themes; minimal, icon-based, monochrome UI.
 - Private by design: no upload, no backend.
 
 ## Documentation
@@ -31,11 +30,3 @@ Extract the text from any image (screenshot, scan, photo, handwriting), right in
 | [Browser setup](docs/browser-setup.md) | Users | Chrome and Edge requirements, setup steps, what the device checklist means |
 | [Architecture](docs/architecture.md) | Developers | Provider interface, session lifecycle, one conversion, structured output, rendering safety, file layout |
 | [Development](docs/development.md) | Developers | Run locally, deploy to GitHub Pages, testing, guidelines, history |
-
-## Run locally
-
-```bash
-python -m http.server 8000 --directory src
-```
-
-Then open <http://localhost:8000/>. No build step, no npm. Deploying to GitHub Pages: see [Development](docs/development.md#deploy-to-github-pages).
