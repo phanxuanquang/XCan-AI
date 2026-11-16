@@ -134,7 +134,7 @@
                 </button>
                 <!-- Tooltip lives on the wrapper: the button already carries the Bootstrap dropdown. -->
                 <div id="translate-wrap" class="dropdown" hidden data-bs-title="Translate">
-                  <button id="translate-btn" class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Translate" disabled>
+                  <button id="translate-btn" class="btn btn-icon" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="Translate" disabled>
                     <span class="material-symbols-rounded" aria-hidden="true">translate</span>
                   </button>
                   <ul id="translate-menu" class="dropdown-menu dropdown-menu-end translate-menu"></ul>

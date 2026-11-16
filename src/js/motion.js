@@ -45,7 +45,11 @@ export function revealOnScroll() {
   const io = new IntersectionObserver((entries) => entries.forEach((e) => {
     if (!e.isIntersecting) return;
     io.unobserve(e.target);
-    animate(e.target, { opacity: [0, 1], y: [16, 0], duration: 600, ease: 'outCubic' });
+    // Drop the leftover transform: it would make a stacking context that traps the dropdown menu.
+    animate(e.target, {
+      opacity: [0, 1], y: [16, 0], duration: 600, ease: 'outCubic',
+      onComplete: () => e.target.style.removeProperty('transform'),
+    });
   }), { threshold: 0.15 });
   blocks.forEach((b) => io.observe(b));
 }
