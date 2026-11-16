@@ -18,8 +18,16 @@ const COMMON_ERRORS = {
   NotSupportedError: 'The built-in model does not accept this input in this browser.',
 };
 
+// Translator API languages listed in Chrome's docs (developer.chrome.com/docs/ai/translator-api).
+// The list may change; Translator.availability() is the real check for each language pair.
+const TRANSLATION_LANGUAGES = ['ar', 'bg', 'bn', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'he', 'hi', 'hr',
+  'hu', 'id', 'it', 'ja', 'kn', 'ko', 'lt', 'mr', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sv', 'ta', 'te',
+  'th', 'tr', 'uk', 'vi', 'zh', 'zh-Hant'];
+
 export class PromptApiProvider extends AiProvider {
   #session = null;
+  #detector = null;
+  #translators = new Map(); // "source>target" → Translator, reused across runs
 
   isSupported() { return 'LanguageModel' in self; }
 
@@ -76,9 +84,41 @@ export class PromptApiProvider extends AiProvider {
     }
   }
 
+  // ---- Translation: Translator + Language Detector APIs (separate built-in models, same W3C family).
+  canTranslate() { return 'Translator' in self && 'LanguageDetector' in self; }
+
+  get translationLanguages() { return TRANSLATION_LANGUAGES; }
+
+  // Docs: avoid very short text, and treat low confidence as unknown. 'und' = undetermined.
+  async detectLanguage(text) {
+    this.#detector ??= await LanguageDetector.create();
+    const [top] = await this.#detector.detect(text);
+    return top && top.detectedLanguage !== 'und' && top.confidence >= 0.5 ? top.detectedLanguage : null;
+  }
+
+  // Must run soon after a click: create() may download a language pack, which needs user activation.
+  async createTranslator(sourceLanguage, targetLanguage, onProgress) {
+    const key = `${sourceLanguage}>${targetLanguage}`;
+    if (!this.#translators.has(key)) {
+      if ((await Translator.availability({ sourceLanguage, targetLanguage })) === 'unavailable') return null;
+      this.#translators.set(key, await Translator.create({
+        sourceLanguage,
+        targetLanguage,
+        monitor(m) {
+          m.addEventListener('downloadprogress', (e) => onProgress(e.loaded)); // loaded is a 0-1 fraction
+        },
+      }));
+    }
+    return this.#translators.get(key);
+  }
+
   destroy() {
     this.#session?.destroy();
     this.#session = null;
+    this.#detector?.destroy();
+    this.#detector = null;
+    this.#translators.forEach((t) => t.destroy());
+    this.#translators.clear();
   }
 
   describeError(error) {

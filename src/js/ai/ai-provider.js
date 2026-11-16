@@ -60,6 +60,23 @@ export class AiProvider {
    */
   async checks(availability) { throw new Error('not implemented'); }
 
+  /** True when the browser has the Translator and Language Detector APIs. */
+  canTranslate() { throw new Error('not implemented'); }
+
+  /** BCP 47 codes offered as translation targets. */
+  get translationLanguages() { throw new Error('not implemented'); }
+
+  /** @returns {Promise<string | null>} BCP 47 code of the text's language, or null when unsure. */
+  async detectLanguage(text) { throw new Error('not implemented'); }
+
+  /**
+   * Translator for one language pair (cached). May download a language pack: call from a user gesture.
+   * @param {(fraction: number) => void} [onProgress] Download progress in [0, 1].
+   * @returns {Promise<{ translate(text: string, options?: { signal?: AbortSignal }): Promise<string> } | null>}
+   *   null when the browser cannot translate this pair.
+   */
+  async createTranslator(sourceLanguage, targetLanguage, onProgress) { throw new Error('not implemented'); }
+
   /** Map a thrown error to a user-facing message. */
   describeError(error) { throw new Error('not implemented'); }
 }
