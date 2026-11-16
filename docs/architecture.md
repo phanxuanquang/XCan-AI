@@ -26,22 +26,24 @@ flowchart TD
 
 ## File layout
 
+The deployed site is everything in `src/`. Diagram labels below are relative to it.
+
 | Path | Role |
 |---|---|
-| [index.html](../index.html) | Page markup, SEO metadata, CDN links |
-| [css/app.css](../css/app.css) | Theme tokens (light/dark, monochrome) and component styles on top of Bootstrap |
-| [js/app.js](../js/app.js) | UI logic: boot flow, help dialog, input, generation, output actions, theme |
-| [js/ocr.js](../js/ocr.js) | System prompt, JSON schema, parsing of the streamed reply |
-| [js/markdown.js](../js/markdown.js) | Marked.js sanitizer and `renderMarkdown()` |
-| [js/motion.js](../js/motion.js) | All animations (Anime.js), reduced-motion aware |
-| [js/ai/ai-provider.js](../js/ai/ai-provider.js) | `AiProvider` interface |
-| [js/ai/prompt-api.js](../js/ai/prompt-api.js) | `PromptApiProvider`: shared `LanguageModel` code (session lifecycle, streaming, errors, device checks) |
-| [js/ai/chrome-provider.js](../js/ai/chrome-provider.js) | `ChromeAiProvider`: name, docs, setup help, CPU/RAM checks |
-| [js/ai/edge-provider.js](../js/ai/edge-provider.js) | `EdgeAiProvider`: name, docs, setup help |
-| [js/ai/index.js](../js/ai/index.js) | `createAiProvider()` picks the provider for the current browser |
-| [assets/favicon.svg](../assets/favicon.svg) | Favicon (Material Symbols `document_scanner`) |
-| [sitemap.xml](../sitemap.xml) | Sitemap for search engines |
-| [.nojekyll](../.nojekyll) | Serve files as-is on GitHub Pages |
+| [src/index.html](../src/index.html) | Page markup, SEO metadata, CDN links |
+| [src/css/app.css](../src/css/app.css) | Theme tokens (light/dark, monochrome) and component styles on top of Bootstrap |
+| [src/js/app.js](../src/js/app.js) | UI logic: boot flow, help dialog, input, generation, output actions, theme |
+| [src/js/ocr.js](../src/js/ocr.js) | System prompt, JSON schema, parsing of the streamed reply |
+| [src/js/markdown.js](../src/js/markdown.js) | Marked.js sanitizer and `renderMarkdown()` |
+| [src/js/motion.js](../src/js/motion.js) | All animations (Anime.js), reduced-motion aware |
+| [src/js/ai/ai-provider.js](../src/js/ai/ai-provider.js) | `AiProvider` interface |
+| [src/js/ai/prompt-api.js](../src/js/ai/prompt-api.js) | `PromptApiProvider`: shared `LanguageModel` code (session lifecycle, streaming, errors, device checks) |
+| [src/js/ai/chrome-provider.js](../src/js/ai/chrome-provider.js) | `ChromeAiProvider`: name, docs, setup help, CPU/RAM checks |
+| [src/js/ai/edge-provider.js](../src/js/ai/edge-provider.js) | `EdgeAiProvider`: name, docs, setup help |
+| [src/js/ai/index.js](../src/js/ai/index.js) | `createAiProvider()` picks the provider for the current browser |
+| [src/assets/favicon.svg](../src/assets/favicon.svg) | Favicon (Material Symbols `document_scanner`) |
+| [src/sitemap.xml](../src/sitemap.xml) | Sitemap for search engines |
+| [.github/workflows/pages.yml](../.github/workflows/pages.yml) | Deploys `src/` to GitHub Pages on push to `master` |
 
 Stack: semantic HTML, plain JavaScript (ES modules), Bootstrap 5.3.3, Material Symbols Rounded, Marked.js 15.0.12, Anime.js 4.4.1, all from CDNs. No build step, no npm.
 
@@ -134,11 +136,11 @@ Earlier findings that shaped this: without structured output the model added tex
 
 ## System prompt
 
-Compressed for a small model; rule order matters. It says: transcribe all text first, including handwriting and odd words (best guess); keep the original language; only text written in the image (no title, caption or description); map visible formatting to Markdown (headings, emphasis, lists, task lists, pipe tables, `~~~` code fences, quotes, links, separators, `*[Image: …]*` for pictures, inline code for math); no HTML. See [js/ocr.js](../js/ocr.js).
+Compressed for a small model; rule order matters. It says: transcribe all text first, including handwriting and odd words (best guess); keep the original language; only text written in the image (no title, caption or description); map visible formatting to Markdown (headings, emphasis, lists, task lists, pipe tables, `~~~` code fences, quotes, links, separators, `*[Image: …]*` for pictures, inline code for math); no HTML. See [src/js/ocr.js](../src/js/ocr.js).
 
 ## Rendering safety
 
-Model output is untrusted. [js/markdown.js](../js/markdown.js) configures Marked so that:
+Model output is untrusted. [src/js/markdown.js](../src/js/markdown.js) configures Marked so that:
 
 - raw HTML is escaped and shown as text;
 - `javascript:`, `vbscript:` and `data:` links and images become `#`;

@@ -40,7 +40,7 @@ flowchart LR
 ## Run locally
 
 ```bash
-python -m http.server 8000
+python -m http.server 8000 --directory src
 ```
 
 Then open <http://localhost:8000/>. No build step, no npm. Deploying to GitHub Pages: see [Development](docs/development.md#deploy-to-github-pages).
