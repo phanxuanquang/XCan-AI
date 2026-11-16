@@ -1,111 +1,46 @@
-# © 2024 Phan Xuan Quang / XCan AI
-------------
-XCan AI is a powerful tool designed to simplify the extraction of text from images. It can handle various types of content, including tables, code, mathematical formulas, and more. Additionally, it can translate the extracted text into Vietnamese while preserving the original format.
+# XCan
 
-The users just input the image by pasting (`Ctrl + V`) or select the image from the local device, then the AI handles the rest to provide the text in the image if any. In addition, the tool can help to translate the text in the image into Vietnamese without changing the text format.
+Turn an image (screenshot, scan, photo, handwriting) into Markdown, right in your browser.
+
+XCan reads the image with the AI model built into **Google Chrome** or **Microsoft Edge**, through the browser's [Prompt API](https://webmachinelearning.github.io/prompt-api/) (`LanguageModel`). There is no server, no account and no API key. Your images never leave your device.
+
+```mermaid
+flowchart LR
+    I["Drop, choose or paste an image"] --> M["Browser's on-device model"] --> R["Live Markdown preview"]
+    R --> A["Edit, copy or download .md"]
+```
+
+## Quick start
+
+1. Open XCan in **Chrome 148 or later** on a desktop computer (or Edge Canary/Dev with the Prompt API flag).
+2. If asked, click **Download model**. The browser downloads it once and shares it with every site.
+3. Drop an image. The Markdown appears as the model writes it.
+
+> [!IMPORTANT]
+> Desktop only, and the model needs about 22 GB of free disk space plus a capable GPU or 16 GB of RAM. See [Browser setup](docs/browser-setup.md).
 
 ## Features
 
-![Image](https://i.imgur.com/xXga9lT.png)
+- Drop, choose or paste (`Ctrl+V`) any image up to 10 MB.
+- Live streaming preview with fade-in, plus an editable Markdown tab with undo.
+- Keeps visible formatting: headings, emphasis, lists, task lists, tables, code, quotes, links.
+- Copy or download as `xcan-output.md`.
+- Light and dark themes; minimal, icon-based, monochrome UI.
+- Private by design: no upload, no backend.
 
-- **Text Extraction**: Extracts text from images with high fidelity, maintaining the original layout and formatting.
-- **Translation**: Translates extracted text into Vietnamese without altering the format.
-- **Support for Various Formats**: Handles tables, code snippets, mathematical formulas, and more.
-- **User-Friendly Interface**: Allows users to input images by pasting, selecting from the local device, or taking a photo.
+## Documentation
 
-## Getting Started
+| Page | For | Contents |
+|---|---|---|
+| [User guide](docs/user-guide.md) | Users | First visit, converting an image, result pane, privacy, limitations |
+| [Browser setup](docs/browser-setup.md) | Users | Chrome and Edge requirements, setup steps, what the device checklist means |
+| [Architecture](docs/architecture.md) | Developers | Provider interface, session lifecycle, one conversion, structured output, rendering safety, file layout |
+| [Development](docs/development.md) | Developers | Run locally, deploy to GitHub Pages, testing, guidelines, history |
 
-### Prerequisites
+## Run locally
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Node.js](https://nodejs.org/) (for the web frontend)
-- [Visual Studio](https://visualstudio.microsoft.com/) or [Visual Studio Code](https://code.visualstudio.com/)
+```bash
+python -m http.server 8000
+```
 
-### Installation
-
-1. **Clone the repository**:
-    ```sh
-    git clone https://github.com/phanxuanquang/XCan-AI.git
-    cd XCan-AI
-    ```
-
-2. **Backend Setup**:
-- In Visual Studio Code: 
-    - Navigate to the `XCan.Api` directory:
-        ```sh
-        cd XCan.Api
-        ```
-    - Restore the .NET dependencies:
-        ```sh
-        dotnet restore
-        ```
-    - Build the project:
-        ```sh
-        dotnet build
-        ```
-- In Visual Studio:
-    - Build the project `XCan.Api`.
-3. **Frontend Setup**:
-    - Navigate to the `xcan.web` directory:
-        ```sh
-        cd ../xcan.web
-        ```
-    - Install the Node.js dependencies:
-        ```sh
-        npm install
-        ```
-
-### Running the Application
-
-1. **Start the Backend**:
-    - Navigate to the `XCan.Api` directory:
-        ```sh
-        cd ../XCan.Api
-        ```
-    - Run the application:
-        ```sh
-        dotnet run
-        ```
-
-2. **Start the Frontend**:
-    - Navigate to the `xcan.web` directory:
-        ```sh
-        cd ../xcan.web
-        ```
-    - Run the application:
-        ```sh
-        npm start
-        ```
-    - Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-## Usage
-
-1. **Gemini API Key**: Obtain a Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey) and enter it in the application.
-2. **Upload Image**: Paste, drag & drop, or select an image from your local device.
-3. **Extract Text**: Click the "Scan" button to extract text from the image.
-4. **Translate Text**: Click the "Translate" button to translate the extracted text into Vietnamese.
-
-## Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. **Fork the repository**.
-2. **Create a new branch**:
-    ```sh
-    git checkout -b feature/your-feature-name
-    ```
-3. **Make your changes**.
-4. **Commit your changes**:
-    ```sh
-    git commit -m "Add your commit message"
-    ```
-5. **Push to the branch**:
-    ```sh
-    git push origin feature/your-feature-name
-    ```
-6. **Create a Pull Request**.
-
-
-## Contact
-
-For any questions or feedback, please open an **Issue** or **Discussion** in this repository.
+Then open <http://localhost:8000/>. No build step, no npm. Deploying to GitHub Pages: see [Development](docs/development.md#deploy-to-github-pages).
