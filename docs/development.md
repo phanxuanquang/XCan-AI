@@ -6,26 +6,34 @@ Run, deploy, test and contribute.
 
 ## Run locally
 
-No build step and no npm. Serve the repository root over HTTP; ES modules do not load from `file://`.
+No build step and no npm. The site is the `src/` folder. Serve it over HTTP; ES modules do not load from `file://`.
 
 ```bash
-python -m http.server 8000
+python -m http.server 8000 --directory src
 ```
 
 Open <http://localhost:8000/> in Chrome or Edge. `localhost` counts as a secure context, which the Prompt API requires.
 
 ## Deploy to GitHub Pages
 
-The app is plain static files with relative paths, so it works under a sub-path such as `https://<user>.github.io/XCan-AI/`. The empty `.nojekyll` file tells Pages to serve the files as they are. Pages serves over HTTPS, which gives the secure context the Prompt API needs.
+The site is deployed by the workflow [.github/workflows/pages.yml](../.github/workflows/pages.yml), based on GitHub's [static starter workflow](https://github.com/actions/starter-workflows/blob/main/pages/static.yml). It uploads only `src/`, so docs and tooling files are not published. Branch publishing can only serve `/` or `/docs`, which is why a workflow is used.
 
-1. Commit and push the branch. Pages only serves committed files.
-2. In the repository, open **Settings → Pages**.
-3. Under **Build and deployment → Source**, choose **Deploy from a branch**.
-4. Pick the branch and the **`/ (root)`** folder, then **Save**.
-5. Wait for the "pages build and deployment" run in the **Actions** tab, then open the site URL.
+```mermaid
+flowchart LR
+    P["Push to master (src/ changed)"] --> W["pages.yml"] --> U["Upload src/ as Pages artifact"] --> D["Deploy"] --> S["https://<user>.github.io/XCan-AI/"]
+```
+
+One-time setup:
+
+1. In the repository, open **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+3. Push a change under `src/` to `master`, or run the workflow from the **Actions** tab (**Run workflow**).
+4. When the run finishes, its summary shows the site URL.
+
+The app uses relative paths only, so it works under the `/XCan-AI/` sub-path. Pages serves over HTTPS, which gives the secure context the Prompt API needs.
 
 > [!NOTE]
-> On a free account the repository must be public to use Pages. If the site URL changes (renamed repo, custom domain), update the canonical link, `og:url` and JSON-LD `url` in `index.html`, and the URL in `sitemap.xml`.
+> On a free account the repository must be public to use Pages. If the site URL changes (renamed repo, custom domain), update the canonical link, `og:url` and JSON-LD `url` in `src/index.html`, and the URL in `src/sitemap.xml`.
 
 Any other static host works the same way, as long as it serves over HTTPS.
 
@@ -34,7 +42,7 @@ Any other static host works the same way, as long as it serves over HTTPS.
 There is no automated test suite. Check changes in a real browser:
 
 - Serve the site and open it in Chrome with the on-device model available.
-- To mimic GitHub Pages, serve the parent folder and open `http://localhost:<port>/XCan-AI/`.
+- To mimic the GitHub Pages sub-path, serve the repository root (`python -m http.server 8000`) and open `http://localhost:8000/src/`.
 - Check desktop and phone widths (for example 1366 px and 390 px).
 - Without a real model, a fake `LanguageModel` injected before page scripts (for example with Playwright's `addInitScript`) can return any `availability()` result and stream any reply. This covers the download, unavailable and streaming paths.
 
@@ -65,6 +73,6 @@ Edge 157: the download dialog renders and `availability()` returns `downloadable
 - Keep it static: no build step, no npm, no backend. Libraries come from CDNs with pinned versions. Paths stay relative.
 - Keep `app.js` behind the `AiProvider` interface. Browser-specific wording and checks go in the Chrome or Edge provider; shared Prompt API code goes in `prompt-api.js`.
 - Facts shown to users (versions, hardware, flags, errors) must come from the official browser docs listed in [Browser setup](browser-setup.md).
-- UI stays minimal and icon-based: every icon control gets a tooltip and an `aria-label`. Colors stay monochrome. Animations go through `js/motion.js` and respect `prefers-reduced-motion`.
+- UI stays minimal and icon-based: every icon control gets a tooltip and an `aria-label`. Colors stay monochrome. Animations go through `src/js/motion.js` and respect `prefers-reduced-motion`.
 - Help and setup text is Markdown, rendered by Marked in the Bootstrap modal.
 - When behavior changes, update the matching page in `docs/` and the history below.
