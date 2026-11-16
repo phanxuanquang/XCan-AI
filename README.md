@@ -1,13 +1,13 @@
 # XCan
 
-Turn an image (screenshot, scan, photo, handwriting) into Markdown, right in your browser.
+Extract the text from any image (screenshot, scan, photo, handwriting), right in your browser. The layout comes out as Markdown you can edit, translate and copy.
 
 XCan reads the image with the AI model built into **Google Chrome** or **Microsoft Edge**, through the browser's [Prompt API](https://webmachinelearning.github.io/prompt-api/) (`LanguageModel`). There is no server, no account and no API key. Your images never leave your device.
 
 ```mermaid
 flowchart LR
     I["Drop, choose or paste an image"] --> M["Browser's on-device model"] --> R["Live Markdown preview"]
-    R --> A["Edit, copy or download .md"]
+    R --> A["Edit, translate or copy"]
 ```
 
 ## Quick start
@@ -24,7 +24,8 @@ flowchart LR
 - Drop, choose or paste (`Ctrl+V`) any image up to 10 MB.
 - Live streaming preview with fade-in, plus an editable Markdown tab with undo.
 - Keeps visible formatting: headings, emphasis, lists, task lists, tables, code, quotes, links.
-- Copy or download as `xcan-output.md`.
+- Translate the result into another language (source language detected), on device.
+- Copy the Markdown to the clipboard.
 - Light and dark themes; minimal, icon-based, monochrome UI.
 - Private by design: no upload, no backend.
 

@@ -57,7 +57,7 @@ Temp profile with a copy of the local Gemini Nano model, site served under `/XCa
 | Session created on load | Ready after about 14 s |
 | OCR of a handwriting sample | About 29 s, transcribed text only, no invented title |
 | Structured output | Valid `{ textFound, markdown }`, streamed live |
-| Loading effects | Scan line, timer chip, skeleton shown |
+| Loading effects | Ring loader during OCR, scrambling text during translation |
 | Markdown rendering | Tables, task lists, quotes, code render |
 | Sanitization | `<img onerror>` escaped, `javascript:` link → `#`, no script ran |
 | Edit / undo, theme toggle | Work |
@@ -73,6 +73,6 @@ Edge 157: the download dialog renders and `availability()` returns `downloadable
 - Keep it static: no build step, no npm, no backend. Libraries come from CDNs with pinned versions. Paths stay relative.
 - Keep `app.js` behind the `AiProvider` interface. Browser-specific wording and checks go in the Chrome or Edge provider; shared Prompt API code goes in `prompt-api.js`.
 - Facts shown to users (versions, hardware, flags, errors) must come from the official browser docs listed in [Browser setup](browser-setup.md).
-- UI stays minimal and icon-based: every icon control gets a tooltip and an `aria-label`. Colors stay monochrome. Animations go through `src/js/motion.js` and respect `prefers-reduced-motion`.
+- UI stays minimal and icon-based: every icon control gets a tooltip and an `aria-label`. Colors stay black, white and grey, through the tokens in `app.css`. Animations go through `src/js/motion.js` and respect `prefers-reduced-motion`.
 - Help and setup text is Markdown, rendered by Marked in the Bootstrap modal.
-- When behavior changes, update the matching page in `docs/` and the history below.
+- When behavior changes, update the matching page in `docs/`.

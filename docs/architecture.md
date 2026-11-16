@@ -35,7 +35,8 @@ The deployed site is everything in `src/`. Diagram labels below are relative to 
 | [src/js/app.js](../src/js/app.js) | UI logic: boot flow, help dialog, input, generation, output actions, theme |
 | [src/js/ocr.js](../src/js/ocr.js) | System prompt, JSON schema, parsing of the streamed reply |
 | [src/js/markdown.js](../src/js/markdown.js) | Marked.js sanitizer and `renderMarkdown()` |
-| [src/js/motion.js](../src/js/motion.js) | All animations (Anime.js), reduced-motion aware |
+| [src/js/translate.js](../src/js/translate.js) | `translateMarkdown()`: translates text while keeping Markdown syntax |
+| [src/js/motion.js](../src/js/motion.js) | Animations (Anime.js): landing reveal on scroll, first-render fade, live-preview fade, translation scramble; reduced-motion aware |
 | [src/js/ai/ai-provider.js](../src/js/ai/ai-provider.js) | `AiProvider` interface |
 | [src/js/ai/prompt-api.js](../src/js/ai/prompt-api.js) | `PromptApiProvider`: shared `LanguageModel` code (session lifecycle, streaming, errors, device checks) |
 | [src/js/ai/chrome-provider.js](../src/js/ai/chrome-provider.js) | `ChromeAiProvider`: name, docs, setup help, CPU/RAM checks |
@@ -45,7 +46,7 @@ The deployed site is everything in `src/`. Diagram labels below are relative to 
 | [src/sitemap.xml](../src/sitemap.xml) | Sitemap for search engines |
 | [.github/workflows/pages.yml](../.github/workflows/pages.yml) | Deploys `src/` to GitHub Pages on push to `master` |
 
-Stack: semantic HTML, plain JavaScript (ES modules), Bootstrap 5.3.3, Material Symbols Rounded, Marked.js 15.0.12, Anime.js 4.4.1, all from CDNs. No build step, no npm.
+Stack: semantic HTML, plain JavaScript (ES modules), Bootstrap 5.3.9, Roboto and Roboto Mono (Google Fonts), Material Symbols Rounded, Marked.js 15.0.12, Anime.js 4.4.1, all from CDNs. No build step, no npm.
 
 ## AI provider interface
 
@@ -63,6 +64,10 @@ Stack: semantic HTML, plain JavaScript (ES modules), Bootstrap 5.3.3, Material S
 | `docs` | Links to the browser's official docs |
 | `setupHelp(availability)` | `{ title, md }`: Markdown help shown in the dialog |
 | `checks(availability)` | `[met, label][]`: what the page can test about the device (`met` is `null` when it cannot tell) |
+| `canTranslate()` | `Translator` and `LanguageDetector` exist |
+| `translationLanguages` | Target language codes offered in the menu (from Chrome's docs) |
+| `detectLanguage(text)` | Top `LanguageDetector` result, or `null` for `und` or confidence below 0.5 |
+| `createTranslator(source, target, onProgress?)` | Cached `Translator` for the pair, or `null` when `availability()` is `unavailable` |
 | `describeError(error)` | User-facing error text |
 
 Browser detection uses `navigator.userAgentData.brands`: `Microsoft Edge` → Edge provider, `Google Chrome` → Chrome provider, anything else → none.
@@ -115,7 +120,7 @@ sequenceDiagram
     P->>S: destroy()
     P-->>A: full JSON
     A->>A: parseOcr() gives { textFound, markdown }
-    A-->>U: final preview and toast
+    A-->>U: final preview
 ```
 
 **Stop** aborts the run through an `AbortSignal` and keeps whatever has streamed so far.
@@ -137,6 +142,16 @@ Earlier findings that shaped this: without structured output the model added tex
 ## System prompt
 
 Compressed for a small model; rule order matters. It says: transcribe all text first, including handwriting and odd words (best guess); keep the original language; only text written in the image (no title, caption or description); map visible formatting to Markdown (headings, emphasis, lists, task lists, pipe tables, `~~~` code fences, quotes, links, separators, `*[Image: …]*` for pictures, inline code for math); no HTML. See [src/js/ocr.js](../src/js/ocr.js).
+
+## Translation
+
+Uses the browser's [Translator API](https://developer.chrome.com/docs/ai/translator-api) and [Language Detector API](https://developer.chrome.com/docs/ai/language-detection) (Edge: [Translator](https://learn.microsoft.com/microsoft-edge/web-platform/translator-api)). These are separate task-specific models, not the Prompt API session.
+
+- The menu click is the user activation that `create()` needs when a language pack must be downloaded.
+- `LanguageDetector` reads the rendered text. Its top result is used unless it is `und` or below 0.5 confidence (the docs advise treating low confidence as unknown).
+- Translators are cached per language pair and destroyed with the session on `pagehide`.
+- The Translator API takes plain text, so [translate.js](../src/js/translate.js) sends only the text of each line: fenced code, rules and table separator rows are skipped; heading, list, quote and checkbox markers stay; table rows are translated cell by cell. Lines go one at a time, matching the API's sequential processing.
+- A translation only changes the Preview (`state.translation`); the Markdown in the Edit tab stays the source. Every translation starts from that source, picking its language again shows it, and editing it drops the old translation. A stopped or failed translation leaves the Preview as it was.
 
 ## Rendering safety
 
