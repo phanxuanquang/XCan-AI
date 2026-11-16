@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>XCan — Image to Markdown, on your device</title>
-  <meta name="description" content="Free image to Markdown converter (OCR) that runs entirely in your browser with the built-in AI in Chrome and Edge. Your image never leaves your device.">
+  <title>XCan — Extract text from any image, even handwriting</title>
+  <meta name="description" content="Free image to text (OCR) that runs entirely in your browser with the built-in AI in Chrome and Edge. Keeps the layout, reads handwriting, and your image never leaves your device.">
   <link rel="canonical" href="https://phanxuanquang.github.io/XCan-AI/">
   <meta name="theme-color" content="#F2F2F2" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0F0F0F" media="(prefers-color-scheme: dark)">
@@ -12,164 +12,216 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="XCan">
-  <meta property="og:title" content="XCan — Image to Markdown, on your device">
-  <meta property="og:description" content="Turn a screenshot, scan or photo into Markdown with your browser's built-in AI. The image never leaves your device.">
+  <meta property="og:title" content="XCan — Extract text from any image, even handwriting">
+  <meta property="og:description" content="Scan a screenshot, photo or handwritten note and extract its text with your browser's built-in AI. The image never leaves your device.">
   <meta property="og:url" content="https://phanxuanquang.github.io/XCan-AI/">
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="XCan — Image to Markdown, on your device">
-  <meta name="twitter:description" content="Turn a screenshot, scan or photo into Markdown with your browser's built-in AI. The image never leaves your device.">
+  <meta name="twitter:title" content="XCan — Extract text from any image, even handwriting">
+  <meta name="twitter:description" content="Scan a screenshot, photo or handwritten note and extract its text with your browser's built-in AI. The image never leaves your device.">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "XCan",
     "url": "https://phanxuanquang.github.io/XCan-AI/",
-    "description": "Converts an image (screenshot, scan or photo) into Markdown using the browser's built-in on-device AI. The image is processed locally and never uploaded.",
+    "description": "Extracts text from an image (screenshot, scan, photo or handwriting), keeping its layout, using the browser's built-in on-device AI. The image is processed locally and never uploaded.",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Any",
     "browserRequirements": "Requires Google Chrome or Microsoft Edge with the built-in Prompt API (on-device language model).",
     "isAccessibleForFree": true,
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": ["Image to Markdown (OCR)", "Runs on-device in the browser", "No upload, no account"],
+    "featureList": ["Image to text (OCR)", "Handwriting recognition", "Keeps headings, lists and tables", "Translation", "Runs on-device in the browser", "No upload, no account"],
     "sameAs": "https://github.com/phanxuanquang/XCan-AI"
   }
   </script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300..800;1,300..800&family=Roboto+Mono:wght@400..600&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0">
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
   <div class="container-xl px-3 px-md-4">
-    <header class="app-header">
-      <a class="wordmark me-auto" href="./" data-bs-title="Image to Markdown with your browser's built-in AI. Nothing is uploaded." data-bs-placement="bottom">
+    <header class="d-flex align-items-center gap-3 py-2 py-md-3">
+      <a class="wordmark me-auto" href="./" data-bs-title="Extract text from images, on your device" data-bs-placement="bottom">
         <span class="material-symbols-rounded" aria-hidden="true">document_scanner</span>XCan
       </a>
-      <span id="status-pill" class="status-dot" data-state="idle" role="status" tabindex="0"
-        aria-label="Checking built-in AI" data-bs-title="Checking built-in AI" data-bs-placement="bottom"><span class="dot"></span></span>
-      <a class="icon-btn" href="https://github.com/phanxuanquang/XCan-AI" target="_blank" rel="noopener noreferrer"
+      <a class="btn btn-icon" href="https://github.com/phanxuanquang/XCan-AI" target="_blank" rel="noopener noreferrer"
         aria-label="Source code on GitHub" data-bs-title="Source code on GitHub" data-bs-placement="bottom">
         <span class="material-symbols-rounded" aria-hidden="true">code</span>
       </a>
-      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Switch theme" data-bs-title="Switch theme" data-bs-placement="bottom">
+      <button id="theme-toggle" class="btn btn-icon" type="button" aria-label="Switch theme" data-bs-title="Switch theme" data-bs-placement="bottom">
         <span class="material-symbols-rounded" aria-hidden="true">dark_mode</span>
       </button>
     </header>
 
     <main>
-      <h1 class="visually-hidden">XCan: image to Markdown on your device</h1>
-
       <noscript>
-        <p>XCan needs JavaScript. It turns a screenshot, scan or photo into Markdown using the built-in AI in Google Chrome or Microsoft Edge, entirely on your device. Enable JavaScript and reload the page.</p>
+        <p>XCan needs JavaScript. It extracts the text from a screenshot, scan or photo using the built-in AI in Google Chrome or Microsoft Edge, entirely on your device. Enable JavaScript and reload the page.</p>
       </noscript>
 
-      <!-- Model setup details; shown only when the user needs to act. -->
-      <!-- Boot screen: shown until the model session is ready; the workspace stays hidden until then. -->
-      <section id="boot" class="boot" aria-live="polite" aria-busy="true">
-        <span id="boot-spinner" class="spinner-border" aria-hidden="true"></span>
-        <div id="model-status" class="boot-body">
-          <strong>Preparing XCan</strong>
-          <span>Checking your browser's built-in AI…</span>
-        </div>
+      <!-- Landing: Bootstrap utilities; data-reveal blocks fade up once (js/motion.js). Details live in tooltips. -->
+      <section class="text-center py-4 py-md-5" aria-labelledby="hero-title" data-reveal>
+        <h1 id="hero-title" class="display-4 fw-bolder lh-1 mb-3">Extract text from any image.</h1>
+        <p class="lead text-body-secondary mb-4">Scans, screenshots, handwriting. Read on your device.</p>
+        <ul class="list-unstyled d-flex justify-content-center gap-2 mb-0" aria-label="Highlights">
+          <li><span class="chip-icon" tabindex="0" data-bs-title="Runs on your device: the image is never uploaded" aria-label="Runs on your device: the image is never uploaded"><span class="material-symbols-rounded" aria-hidden="true">lock</span></span></li>
+          <li><span class="chip-icon" tabindex="0" data-bs-title="Reads handwriting too" aria-label="Reads handwriting too"><span class="material-symbols-rounded" aria-hidden="true">draw</span></span></li>
+          <li><span class="chip-icon" tabindex="0" data-bs-title="Keeps headings, lists and tables" aria-label="Keeps headings, lists and tables"><span class="material-symbols-rounded" aria-hidden="true">table_chart</span></span></li>
+          <li><span class="chip-icon" tabindex="0" data-bs-title="Translate the result" aria-label="Translate the result"><span class="material-symbols-rounded" aria-hidden="true">translate</span></span></li>
+          <li><span class="chip-icon" tabindex="0" data-bs-title="Free, no account, no API key" aria-label="Free, no account, no API key"><span class="material-symbols-rounded" aria-hidden="true">money_off</span></span></li>
+        </ul>
       </section>
 
-      <!-- data-view: "input" shows only the drop pane; "result" shows only the live preview. -->
-      <div id="workspace" class="workspace" data-view="input" hidden>
-        <section class="pane source-pane" aria-label="Source image">
-          <label id="dropzone" for="file-input">
-            <span id="drop-hint" class="drop-hint">
-              <span class="material-symbols-rounded" aria-hidden="true">add_photo_alternate</span>
-              <strong><span class="hint-desktop">Drop, choose or paste an image</span><span class="hint-touch">Tap to choose or take a photo</span></strong>
-              <span>PNG, JPG, WEBP or GIF up to 10 MB</span>
-            </span>
-          </label>
-          <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="visually-hidden">
+      <!-- The tool: boot screen until the model is ready, then the drop area / live preview. -->
+      <div id="app" data-reveal>
+        <section id="boot" class="boot" aria-live="polite" aria-busy="true">
+          <span id="boot-spinner" class="spinner-border" aria-hidden="true"></span>
+          <div id="model-status" class="boot-body">
+            <strong>Preparing XCan</strong>
+            <span>Checking your browser's built-in AI…</span>
+          </div>
         </section>
 
-        <section id="output" class="pane result-pane" aria-label="Markdown result">
-          <div class="pane-head">
-            <span id="scan-frame" class="scan-frame" data-bs-title="Image being converted">
-              <img id="preview-image" alt="Image being converted">
-              <span class="scan-sweep" aria-hidden="true"></span>
-              <span class="scan-line" aria-hidden="true"></span>
-            </span>
-
-            <ul class="nav segmented" role="tablist">
-              <li role="presentation" data-bs-title="Preview">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-preview" type="button" role="tab"
-                  aria-controls="tab-preview" aria-selected="true" aria-label="Preview">
-                  <span class="material-symbols-rounded" aria-hidden="true">article</span>
-                </button>
-              </li>
-              <li role="presentation" data-bs-title="Edit Markdown">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-code" type="button" role="tab"
-                  aria-controls="tab-code" aria-selected="false" aria-label="Edit Markdown">
-                  <span class="material-symbols-rounded" aria-hidden="true">markdown</span>
-                </button>
-              </li>
-            </ul>
-
-            <span id="loading" class="progress-chip d-none" role="status" aria-live="polite">
-              <span class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
-              <span id="loading-text" class="visually-hidden">Reading the image</span>
-              <span id="loading-time">0 s</span>
-            </span>
-
-            <div class="result-tools">
-              <button id="stop-btn" class="icon-btn is-danger d-none" type="button" aria-label="Stop" data-bs-title="Stop">
-                <span class="material-symbols-rounded" aria-hidden="true">stop_circle</span>
-              </button>
-              <button id="generate-btn" class="icon-btn" type="button" disabled aria-label="Convert again" data-bs-title="Convert again">
-                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                <span class="material-symbols-rounded" aria-hidden="true">refresh</span>
-              </button>
-              <button id="revert-btn" class="icon-btn d-none" type="button" aria-label="Undo my edits" data-bs-title="Undo my edits">
-                <span class="material-symbols-rounded" aria-hidden="true">undo</span>
-              </button>
-              <button id="copy-btn" class="icon-btn" type="button" aria-label="Copy Markdown" data-bs-title="Copy Markdown" disabled>
-                <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
-              </button>
-              <button id="download-btn" class="icon-btn" type="button" aria-label="Download .md" data-bs-title="Download .md" disabled>
-                <span class="material-symbols-rounded" aria-hidden="true">download</span>
-              </button>
-              <button id="clear-btn" class="icon-btn is-primary" type="button" aria-label="New image" data-bs-title="New image">
+        <!-- data-view: "input" shows only the drop pane; "result" shows only the live preview. -->
+        <div id="workspace" class="workspace" data-view="input" hidden>
+          <section class="pane source-pane" aria-label="Source image">
+            <label id="dropzone" for="file-input">
+              <span id="drop-hint" class="drop-hint">
                 <span class="material-symbols-rounded" aria-hidden="true">add_photo_alternate</span>
+                <strong><span class="hint-desktop">Drop, choose or paste an image</span><span class="hint-touch">Tap to choose or take a photo</span></strong>
+                <span data-bs-title="PNG, JPG, WEBP or GIF">Up to 10 MB</span>
+                <span id="drop-error" class="drop-error" role="alert"></span>
+              </span>
+            </label>
+            <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="visually-hidden">
+          </section>
+
+          <section id="output" class="pane result-pane" aria-label="Extracted text">
+            <div class="pane-head">
+              <button id="scan-frame" class="scan-frame" type="button" data-bs-toggle="modal" data-bs-target="#image-dialog"
+                aria-label="View original image" data-bs-title="View original image">
+                <img id="preview-image" class="object-fit-cover" alt="">
               </button>
-            </div>
-          </div>
 
-          <div id="error" class="notice result-error d-none" role="alert"></div>
+              <ul class="nav nav-pills segmented" role="tablist">
+                <li role="presentation" data-bs-title="Preview">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-preview" type="button" role="tab"
+                    aria-controls="tab-preview" aria-selected="true" aria-label="Preview">
+                    <span class="material-symbols-rounded" aria-hidden="true">article</span>
+                  </button>
+                </li>
+                <li role="presentation" data-bs-title="Edit text">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-code" type="button" role="tab"
+                    aria-controls="tab-code" aria-selected="false" aria-label="Edit text">
+                    <span class="material-symbols-rounded" aria-hidden="true">edit_note</span>
+                  </button>
+                </li>
+              </ul>
 
-          <div class="tab-content">
-            <div id="tab-preview" class="tab-pane fade show active paper" role="tabpanel" tabindex="0">
-              <div id="empty-result" class="paper-empty">
-                <span class="material-symbols-rounded" aria-hidden="true">draft</span>
-                <span>Markdown appears here</span>
+              <span id="loading-text" class="visually-hidden" role="status" aria-live="polite"></span>
+
+              <div class="d-flex align-items-center gap-0 gap-md-1 ms-auto">
+                <button id="stop-btn" class="btn btn-icon is-danger d-none" type="button" aria-label="Stop" data-bs-title="Stop">
+                  <span class="material-symbols-rounded" aria-hidden="true">stop_circle</span>
+                </button>
+                <button id="generate-btn" class="btn btn-icon" type="button" disabled aria-label="Convert again" data-bs-title="Convert again">
+                  <span class="material-symbols-rounded" aria-hidden="true">wand_shine</span>
+                </button>
+                <!-- Tooltip lives on the wrapper: the button already carries the Bootstrap dropdown. -->
+                <div id="translate-wrap" class="dropdown" hidden data-bs-title="Translate">
+                  <button id="translate-btn" class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Translate" disabled>
+                    <span class="material-symbols-rounded" aria-hidden="true">translate</span>
+                  </button>
+                  <ul id="translate-menu" class="dropdown-menu dropdown-menu-end translate-menu"></ul>
+                </div>
+                <button id="revert-btn" class="btn btn-icon d-none" type="button" aria-label="Restore original" data-bs-title="Restore original">
+                  <span class="material-symbols-rounded" aria-hidden="true">undo</span>
+                </button>
+                <button id="copy-btn" class="btn btn-icon" type="button" aria-label="Copy text" data-bs-title="Copy text" disabled>
+                  <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+                </button>
+                <button id="clear-btn" class="btn btn-icon is-primary" type="button" aria-label="New image" data-bs-title="New image">
+                  <span class="material-symbols-rounded" aria-hidden="true">add_photo_alternate</span>
+                </button>
               </div>
-              <div id="preview-skeleton" class="skeleton d-none" aria-hidden="true">
-                <span class="placeholder lg w-50"></span>
-                <span class="placeholder w-100"></span>
-                <span class="placeholder w-75"></span>
-                <span class="placeholder w-100"></span>
-                <span class="placeholder w-25 mt-4"></span>
-                <span class="placeholder w-100"></span>
-                <span class="placeholder w-50"></span>
+            </div>
+
+            <div id="error" class="alert result-error d-none" role="alert"></div>
+
+            <div class="tab-content">
+              <div id="tab-preview" class="tab-pane show active paper" role="tabpanel" tabindex="0">
+                <div id="empty-result" class="paper-empty">
+                  <span class="material-symbols-rounded" aria-hidden="true">draft</span>
+                  <span>Text appears here</span>
+                </div>
+                <!-- Ring loader (Bootstrap spinner) while the model reads the image. -->
+                <div id="preview-loader" class="paper-empty d-none" aria-hidden="true">
+                  <span class="spinner-border"></span>
+                </div>
+                <article id="output-rendered" class="paper-inner d-none"></article>
               </div>
-              <article id="output-rendered" class="paper-inner d-none"></article>
+              <div id="tab-code" class="tab-pane" role="tabpanel">
+                <label for="output-code" class="visually-hidden">Extracted text, as Markdown (editable)</label>
+                <textarea id="output-code" spellcheck="false"></textarea>
+              </div>
             </div>
-            <div id="tab-code" class="tab-pane fade" role="tabpanel">
-              <label for="output-code" class="visually-hidden">Markdown source (editable)</label>
-              <textarea id="output-code" spellcheck="false"></textarea>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
+
+      <section id="how" class="pt-5" aria-label="How it works" data-reveal>
+        <ol class="list-unstyled d-flex justify-content-center align-items-start gap-3 gap-sm-4 mb-0">
+          <li class="text-center" tabindex="0" data-bs-title="Drop, choose or paste (Ctrl+V) an image up to 10 MB">
+            <span class="chip-icon"><span class="material-symbols-rounded" aria-hidden="true">add_photo_alternate</span></span>
+            <span class="d-block small fw-semibold mt-2">Add</span>
+          </li>
+          <li class="d-none d-sm-block text-body-secondary pt-2" aria-hidden="true"><span class="material-symbols-rounded">arrow_forward</span></li>
+          <li class="text-center" tabindex="0" data-bs-title="Let the on-device AI extract the text, keeping the layout and reading handwriting">
+            <span class="chip-icon"><span class="material-symbols-rounded" aria-hidden="true">document_scanner</span></span>
+            <span class="d-block small fw-semibold mt-2">Scan</span>
+          </li>
+          <li class="d-none d-sm-block text-body-secondary pt-2" aria-hidden="true"><span class="material-symbols-rounded">arrow_forward</span></li>
+          <li class="text-center" tabindex="0" data-bs-title="Edit, translate and copy the text">
+            <span class="chip-icon"><span class="material-symbols-rounded" aria-hidden="true">content_copy</span></span>
+            <span class="d-block small fw-semibold mt-2">Copy</span>
+          </li>
+        </ol>
+      </section>
     </main>
+
+    <footer class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-5 py-3 border-top text-body-secondary small">
+      <span class="d-inline-flex align-items-center gap-2">
+        <a class="link-secondary link-underline-opacity-0" href="https://developer.chrome.com/docs/ai/prompt-api" target="_blank" rel="noopener noreferrer"
+          data-bs-title="Chrome 148+ on desktop: about 22 GB free disk, GPU over 4 GB VRAM or 16 GB RAM">Chrome</a>
+        <span aria-hidden="true">/</span>
+        <a class="link-secondary link-underline-opacity-0" href="https://learn.microsoft.com/microsoft-edge/web-platform/prompt-api" target="_blank" rel="noopener noreferrer"
+          data-bs-title="Edge Canary or Dev with the Prompt API flag: about 20 GB free disk, 5.5 GB VRAM">Edge</a>
+      </span>
+
+      // span prompt user to the github repos
+      <span class="d-inline-flex align-items-center gap-2">
+        <a class="link-secondary link-underline-opacity-0" href="https://github.com/phanxuanquang/XCan-AI" target="_blank" rel="noopener noreferrer"
+          data-bs-title="phanxuanquang/XCan-AI">Find the repository on GitHub</a>
+    </footer>
+  </div>
+
+  <!-- Original image (Bootstrap modal), opened from the thumbnail; sized to the image by css/app.css. -->
+  <div id="image-dialog" class="modal fade" tabindex="-1" aria-label="Original image" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title fs-5">Original image</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body image-view"><img id="image-full" alt="Original image"></div>
+    </div></div>
   </div>
 
   <!-- Setup / help dialog (Bootstrap modal): model download, unsupported browser or device. -->
   <div id="info-dialog" class="modal fade" tabindex="-1" aria-labelledby="info-title" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h2 id="info-title" class="modal-title fs-5"></h2>
@@ -177,23 +229,14 @@
         </div>
         <div id="info-body" class="modal-body"></div>
         <div class="modal-footer">
-          <button type="button" class="btn-quiet" data-bs-dismiss="modal">Close</button>
-          <button id="info-confirm" type="button" class="btn-ink"></button>
+          <button type="button" class="btn btn-quiet" data-bs-dismiss="modal">Close</button>
+          <button id="info-confirm" type="button" class="btn btn-ink"></button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true">
-      <div class="d-flex">
-        <div id="toast-body" class="toast-body"></div>
-        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/animejs@4.4.1/dist/bundles/anime.umd.min.js"></script>
   <script type="module" src="js/app.js"></script>

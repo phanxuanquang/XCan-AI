@@ -1,19 +1,18 @@
 /* XCan — "scanner bed" theme on top of Bootstrap 5.3.
-   Two panes: glass (source image) and paper (Markdown). One bold moment: the highlighter scan line. */
+   Two views: the drop area (source image) and the paper (Markdown). */
 
 :root,
 [data-bs-theme="light"] {
-  /* Monochrome: black, white and greys only. */
+  /* Black, white and greys only. "Primary" is the ink colour itself. */
   --x-bg: #F2F2F2;
   --x-surface: #FFFFFF;
   --x-paper: #FFFFFF;
   --x-ink: #141414;
   --x-muted: #6B6B6B;
   --x-line: #DADADA;
-  --x-accent-hover: #3A3A3A;
-  --x-accent-ink: #FFFFFF;
-  --x-mark: #9E9E9E;
-  --x-warn: #9E9E9E;
+  --x-primary: #141414; /* fills: buttons, active item, progress */
+  --x-primary-hover: #3A3A3A;
+  --x-on-primary: #FFFFFF;
   --x-code-bg: #F4F4F4;
   --x-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 8px 24px -12px rgba(0, 0, 0, .16);
 }
@@ -25,18 +24,17 @@
   --x-ink: #EDEDED;
   --x-muted: #9A9A9A;
   --x-line: #2E2E2E;
-  --x-accent-hover: #FFFFFF;
-  --x-accent-ink: #0F0F0F;
-  --x-mark: #8A8A8A;
-  --x-warn: #7A7A7A;
+  --x-primary: #EDEDED;
+  --x-primary-hover: #FFFFFF;
+  --x-on-primary: #0F0F0F;
   --x-code-bg: #141414;
   --x-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 12px 28px -14px rgba(0, 0, 0, .7);
 }
 
 :root {
-  --x-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --x-serif: "Iowan Old Style", "Charter", "Bitstream Charter", "Palatino Linotype", Palatino, Georgia, serif;
-  --x-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  /* Roboto + Roboto Mono from Google Fonts (index.html); fallbacks only while they load. */
+  --x-sans: "Roboto", system-ui, sans-serif;
+  --x-mono: "Roboto Mono", ui-monospace, monospace;
   --x-radius-lg: 16px;
   --x-radius: 10px;
 }
@@ -45,7 +43,16 @@
   --bs-body-bg: var(--x-bg);
   --bs-body-color: var(--x-ink);
   --bs-body-font-family: var(--x-sans);
+  --bs-font-sans-serif: var(--x-sans);
+  --bs-font-monospace: var(--x-mono);
   --bs-focus-ring-color: color-mix(in srgb, var(--x-ink) 35%, transparent);
+  /* Bootstrap's own tokens follow the monochrome palette, so utilities and components match. */
+  --bs-emphasis-color: var(--x-ink);
+  --bs-secondary-color: var(--x-muted);
+  --bs-border-color: var(--x-line);
+  --bs-tertiary-bg: var(--x-code-bg);
+  --bs-primary: var(--x-primary);
+  --bs-primary-rgb: 20, 20, 20;
 }
 
 body { -webkit-font-smoothing: antialiased; }
@@ -60,14 +67,6 @@ body { -webkit-font-smoothing: antialiased; }
 :focus-visible {
   outline: 2px solid var(--x-ink);
   outline-offset: 2px;
-}
-
-/* ---------- Header ---------- */
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding-block: 1rem;
 }
 
 .wordmark {
@@ -86,56 +85,75 @@ body { -webkit-font-smoothing: antialiased; }
   font-variation-settings: "FILL" 1, "wght" 500;
 }
 
-.status-dot {
+/* ---------- Buttons: Bootstrap .btn themed through its --bs-btn-* variables ---------- */
+.btn {
+  --bs-btn-font-weight: 600;
+  --bs-btn-font-size: .9375rem;
+  --bs-btn-padding-x: 1.1rem;
+  --bs-btn-padding-y: .5rem;
+  --bs-btn-border-radius: var(--x-radius);
+  --bs-btn-disabled-opacity: .4;
+  --bs-btn-focus-box-shadow: none; /* the global :focus-visible outline is the focus ring */
+}
+
+.btn-ink {
+  --bs-btn-color: var(--x-on-primary);
+  --bs-btn-bg: var(--x-primary);
+  --bs-btn-border-color: var(--x-primary);
+  --bs-btn-hover-color: var(--x-on-primary);
+  --bs-btn-hover-bg: var(--x-primary-hover);
+  --bs-btn-hover-border-color: var(--x-primary-hover);
+  --bs-btn-active-color: var(--x-on-primary);
+  --bs-btn-active-bg: var(--x-primary-hover);
+  --bs-btn-active-border-color: var(--x-primary-hover);
+  --bs-btn-disabled-color: var(--x-on-primary);
+  --bs-btn-disabled-bg: var(--x-primary);
+  --bs-btn-disabled-border-color: var(--x-primary);
+  min-height: 2.75rem;
+}
+
+.btn-quiet {
+  --bs-btn-color: var(--x-ink);
+  --bs-btn-border-color: var(--x-line);
+  --bs-btn-hover-color: var(--x-ink);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--x-ink) 6%, transparent);
+  --bs-btn-hover-border-color: var(--x-line);
+  --bs-btn-active-color: var(--x-ink);
+  --bs-btn-active-bg: color-mix(in srgb, var(--x-ink) 10%, transparent);
+  --bs-btn-active-border-color: var(--x-line);
+  min-height: 2.75rem;
+}
+
+/* Round icon button (every toolbar control). */
+.btn-icon {
+  --bs-btn-padding-x: 0;
+  --bs-btn-padding-y: 0;
+  --bs-btn-border-width: 0;
+  --bs-btn-border-radius: 50%;
+  --bs-btn-color: var(--x-muted);
+  --bs-btn-hover-color: var(--x-ink);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--x-ink) 7%, transparent);
+  --bs-btn-active-color: var(--x-ink);
+  --bs-btn-active-bg: color-mix(in srgb, var(--x-ink) 12%, transparent);
+  --bs-btn-disabled-color: var(--x-muted);
   display: inline-grid;
   place-items: center;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
-  cursor: help;
 }
 
-.status-dot .dot {
-  width: .625rem;
-  height: .625rem;
-  border-radius: 50%;
-  background: var(--x-muted);
+.btn-icon.is-primary {
+  --bs-btn-color: var(--x-on-primary);
+  --bs-btn-bg: var(--x-primary);
+  --bs-btn-hover-color: var(--x-on-primary);
+  --bs-btn-hover-bg: var(--x-primary-hover);
+  --bs-btn-active-color: var(--x-on-primary);
+  --bs-btn-active-bg: var(--x-primary-hover);
+  --bs-btn-disabled-color: var(--x-on-primary);
+  --bs-btn-disabled-bg: var(--x-primary);
 }
 
-.status-dot:is([data-state="ready"], [data-state="action"]) .dot { background: var(--x-ink); box-shadow: 0 0 0 4px color-mix(in srgb, var(--x-ink) 20%, transparent); }
-.status-dot[data-state="blocked"] .dot { background: var(--x-warn); box-shadow: 0 0 0 4px color-mix(in srgb, var(--x-warn) 22%, transparent); }
-
-.icon-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--x-muted);
-  text-decoration: none;
-}
-
-.icon-btn:hover:not(:disabled) { color: var(--x-ink); background: color-mix(in srgb, var(--x-ink) 7%, transparent); }
-.icon-btn:disabled { opacity: .4; cursor: not-allowed; }
-
-.icon-btn.is-primary {
-  background: var(--x-ink);
-  color: var(--x-accent-ink);
-}
-
-.icon-btn.is-primary:hover:not(:disabled) { background: var(--x-accent-hover); color: var(--x-accent-ink); }
-.icon-btn.is-danger, .icon-btn.is-danger:hover:not(:disabled) { color: var(--x-ink); }
-
-/* ---------- Error notice (result pane) ---------- */
-.notice {
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--x-line);
-  border-left: 4px solid var(--x-ink);
-  border-radius: var(--x-radius);
-  line-height: 1.5;
-}
+.btn-icon.is-danger { --bs-btn-color: var(--x-ink); }
 
 /* ---------- Boot screen ---------- */
 .boot {
@@ -143,7 +161,7 @@ body { -webkit-font-smoothing: antialiased; }
   justify-items: center;
   align-content: center;
   gap: 1.25rem;
-  min-height: calc(100dvh - 7rem); /* fill the screen under the header */
+  min-height: 26rem; /* same height as the drop area: no jump when it appears */
   padding: 2rem 1rem;
   text-align: center;
 }
@@ -178,22 +196,7 @@ body { -webkit-font-smoothing: antialiased; }
 .modal-body a { color: var(--x-ink); text-underline-offset: 2px; }
 .modal-body a[target]::after { content: " \2197"; color: var(--x-muted); }
 
-.btn-quiet {
-  min-height: 2.75rem;
-  padding: .5rem 1.1rem;
-  border: 1px solid var(--x-line);
-  border-radius: var(--x-radius);
-  background: transparent;
-  color: var(--x-ink);
-  font-weight: 600;
-  font-size: .9375rem;
-}
-
-.btn-quiet:hover { background: color-mix(in srgb, var(--x-ink) 6%, transparent); }
 .boot-body .progress { width: min(20rem, 80vw); height: .375rem; justify-self: center; background: var(--x-code-bg); }
-.boot-body .progress-bar { background: var(--x-ink); }
-.download-pct { margin-top: .5rem; font-size: .8125rem; color: var(--x-muted); font-variant-numeric: tabular-nums; }
-
 /* ---------- Workspace ---------- */
 /* One pane at a time: drop pane first, then only the live preview. */
 .workspace[data-view="input"] .result-pane,
@@ -223,7 +226,7 @@ body { -webkit-font-smoothing: antialiased; }
 #dropzone {
   display: grid;
   place-items: center;
-  min-height: calc(100dvh - 9rem); /* scanner bed fills the screen */
+  min-height: 24rem;
   padding: 1.5rem;
   border: 2px dashed var(--x-line);
   border-radius: var(--x-radius);
@@ -232,12 +235,11 @@ body { -webkit-font-smoothing: antialiased; }
     var(--x-bg);
   text-align: center;
   cursor: pointer;
-  transition: border-color .15s, background-color .15s;
 }
 
 #dropzone:hover,
-#dropzone.dragging { border-color: var(--x-ink); }
-#dropzone.dragging { background-color: color-mix(in srgb, var(--x-ink) 8%, var(--x-bg)); }
+#dropzone.dragging { border-color: var(--x-primary); }
+#dropzone.dragging { background-color: color-mix(in srgb, var(--x-primary) 10%, var(--x-bg)); }
 
 .drop-hint .material-symbols-rounded {
   display: block;
@@ -248,113 +250,83 @@ body { -webkit-font-smoothing: antialiased; }
 }
 
 .drop-hint strong { display: block; color: var(--x-ink); font-size: clamp(1.0625rem, .9rem + .6vw, 1.5rem); font-weight: 600; margin-bottom: .35rem; }
-.drop-hint > span:last-child { color: var(--x-muted); font-size: clamp(.875rem, .8rem + .25vw, 1rem); }
+.drop-error { display: block; margin-top: .75rem; color: var(--x-ink); font-weight: 600; }
+.drop-error:empty { display: none; }
+.drop-hint > span:nth-child(3) { color: var(--x-muted); font-size: clamp(.875rem, .8rem + .25vw, 1rem); }
 
-/* Thumbnail of the source image in the result header; the scan runs on it while converting. */
-.scan-frame { position: relative; display: inline-block; line-height: 0; overflow: hidden; border-radius: 6px; }
-.scan-frame img { height: 2.75rem; max-width: 6rem; object-fit: cover; box-shadow: 0 0 0 1px var(--x-line); }
-/* Scan line + swept tint: real elements, moved by Anime.js (js/motion.js). Hidden when idle. */
-.scan-line,
-.scan-sweep {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  pointer-events: none;
-  opacity: 0;
+/* Thumbnail of the source image in the result header; click opens the full image. */
+.scan-frame { position: relative; display: inline-block; line-height: 0; overflow: hidden; border-radius: 6px; padding: 0; border: 0; background: none; cursor: zoom-in; }
+/* Image dialog sizes itself to the image, which keeps its own ratio inside the viewport. */
+#image-dialog .modal-dialog { width: fit-content; max-width: none; }
+.image-view { padding: 0; overflow: hidden; border-radius: 0 0 var(--x-radius-lg) var(--x-radius-lg); }
+.image-view img {
+  display: block;
+  min-width: 16rem; /* wide enough for the header */
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 9rem);
 }
-
-.scan-sweep {
-  height: 0;
-  background: color-mix(in srgb, var(--x-mark) 30%, transparent);
-  mix-blend-mode: multiply;
-}
-
-[data-bs-theme="dark"] .scan-sweep { mix-blend-mode: screen; background: color-mix(in srgb, var(--x-mark) 18%, transparent); }
-
-.scan-line {
-  height: 3px;
-  border-radius: 2px;
-  background: var(--x-mark);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .12), 0 0 14px 4px color-mix(in srgb, var(--x-mark) 55%, transparent);
-}
-
-.btn-ink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .5rem;
-  min-height: 2.75rem;
-  padding: .5rem 1.1rem;
-  border: 0;
-  border-radius: var(--x-radius);
-  background: var(--x-ink);
-  color: var(--x-accent-ink);
-  font-weight: 600;
-  font-size: .9375rem;
-}
-
-.btn-ink:hover:not(:disabled) { background: var(--x-accent-hover); color: var(--x-accent-ink); }
-
-.btn-ink:disabled { opacity: .45; cursor: not-allowed; }
-
+.scan-frame img { height: 2.75rem; max-width: 6rem; box-shadow: 0 0 0 1px var(--x-line); }
 /* Result pane */
+/* Preview / Edit tabs: Bootstrap .nav-pills themed through its variables. */
 .segmented {
-  display: inline-flex;
+  --bs-nav-link-padding-x: .7rem;
+  --bs-nav-link-padding-y: .35rem;
+  --bs-nav-link-color: var(--x-muted);
+  --bs-nav-link-hover-color: var(--x-ink);
+  --bs-nav-pills-border-radius: 999px;
+  --bs-nav-pills-link-active-bg: var(--x-surface);
+  --bs-nav-pills-link-active-color: var(--x-ink);
+  flex-wrap: nowrap;
   padding: 3px;
   border-radius: 999px;
   background: var(--x-bg);
   border: 1px solid var(--x-line);
-  margin: 0;
-  list-style: none;
 }
 
-.segmented .nav-link {
-  display: inline-flex;
-  padding: .35rem .7rem;
-  border: 0;
-  border-radius: 999px;
-  color: var(--x-muted);
-  background: transparent;
+.segmented .nav-link { display: inline-flex; }
+.segmented .nav-link.active { box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+
+.translate-menu {
+  --bs-dropdown-bg: var(--x-surface);
+  --bs-dropdown-border-color: var(--x-line);
+  --bs-dropdown-link-color: var(--x-ink);
+  --bs-dropdown-link-hover-bg: color-mix(in srgb, var(--x-ink) 7%, transparent);
+  --bs-dropdown-header-color: var(--x-muted);
+  max-height: min(60vh, 22rem);
+  overflow-y: auto;
+  box-shadow: var(--x-shadow);
 }
+.translate-menu .dropdown-item { display: flex; justify-content: space-between; gap: 1rem; }
+.translate-menu .dropdown-item small { color: var(--x-muted); }
 
-.segmented .nav-link.active {
-  background: var(--x-surface);
-  color: var(--x-ink);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+/* Error: Bootstrap .alert themed through its --bs-alert-* variables. */
+.result-error {
+  --bs-alert-bg: transparent;
+  --bs-alert-color: var(--x-ink);
+  --bs-alert-border-color: var(--x-line);
+  --bs-alert-padding-x: 1.25rem;
+  --bs-alert-padding-y: 1rem;
+  --bs-alert-border-radius: var(--x-radius);
+  border-left: 4px solid var(--x-ink);
+  margin: 1rem 1.25rem 0;
 }
-
-.result-tools { display: flex; align-items: center; gap: .25rem; margin-left: auto; }
-
-.progress-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  padding: .25rem .7rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--x-mark) 35%, var(--x-surface));
-  color: var(--x-ink);
-  font-size: .8125rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.progress-chip .spinner-grow { width: .6rem; height: .6rem; color: var(--x-warn); }
-
-.result-error { margin: 1rem 1.25rem 0; }
 
 /* Paper */
 .paper {
-  min-height: 30rem;
-  max-height: 75vh;
+  min-height: 16rem;
+  max-height: 60vh;
   overflow: auto;
   background: var(--x-paper);
 }
 
+/* Column layout so the empty hint / ring loader fill the paper and sit in its centre. */
+.tab-content > .paper.active { display: flex; flex-direction: column; }
+
 .paper-inner {
+  width: 100%; /* flex child: auto margins would otherwise shrink it */
   max-width: 78ch;
   margin-inline: auto; /* centered reading column on wide screens */
   padding: 2rem clamp(1.25rem, 3vw, 2.75rem) 2.5rem;
-  font-family: var(--x-serif);
   font-size: 1.0625rem;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -365,7 +337,6 @@ body { -webkit-font-smoothing: antialiased; }
 
 .paper-inner h1, .paper-inner h2, .paper-inner h3,
 .paper-inner h4, .paper-inner h5, .paper-inner h6 {
-  font-family: var(--x-sans);
   font-weight: 700;
   letter-spacing: -.015em;
   line-height: 1.25;
@@ -379,7 +350,7 @@ body { -webkit-font-smoothing: antialiased; }
 .paper-inner p, .paper-inner ul, .paper-inner ol { margin: 0 0 1em; }
 .paper-inner li + li { margin-top: .2em; }
 :is(.paper-inner, .modal-body) li:has(> input[type=checkbox]) { list-style: none; margin-left: -1.4em; }
-:is(.paper-inner, .modal-body) li > input[type=checkbox] { margin-right: .5em; accent-color: var(--x-ink); }
+:is(.paper-inner, .modal-body) li > input[type=checkbox] { margin-right: .5em; accent-color: var(--x-primary); }
 .paper-inner a { color: var(--x-ink); text-underline-offset: 2px; }
 
 .paper-inner code {
@@ -416,25 +387,25 @@ body { -webkit-font-smoothing: antialiased; }
 .paper-inner hr { border: 0; border-top: 1px solid var(--x-line); opacity: 1; margin: 2em 0; }
 .paper-inner img { max-width: 100%; border-radius: 6px; }
 
-.paper-inner .table-wrap { overflow-x: auto; margin: 0 0 1.25em; }
-
-.paper-inner table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--x-sans);
+/* Tables: Bootstrap .table.table-bordered inside .table-responsive (added by markdown.js). */
+.paper-inner .table-responsive { margin: 0 0 1.25em; }
+.paper-inner .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: inherit;
+  --bs-table-border-color: var(--x-line);
+  margin: 0;
   font-size: .9rem;
   line-height: 1.45;
 }
-
-.paper-inner th, .paper-inner td { padding: .5rem .75rem; border: 1px solid var(--x-line); vertical-align: top; }
-.paper-inner th { background: var(--x-code-bg); font-weight: 650; }
+.paper-inner .table > :not(caption) > * > * { padding: .5rem .75rem; vertical-align: top; }
+.paper-inner .table th { --bs-table-bg: var(--x-code-bg); font-weight: 650; }
 
 .paper-empty {
   display: grid;
   place-items: center;
   align-content: center;
   gap: .5rem;
-  min-height: 30rem;
+  flex: 1 0 auto;
   padding: 2rem;
   color: var(--x-muted);
   text-align: center;
@@ -443,16 +414,12 @@ body { -webkit-font-smoothing: antialiased; }
 .paper-empty .material-symbols-rounded { font-size: 2.5rem; font-variation-settings: "opsz" 48, "wght" 300; }
 .paper-empty span:last-child { font-size: .9rem; }
 
-.skeleton { padding: 2rem clamp(1.25rem, 3vw, 2.75rem); }
-.skeleton .placeholder { display: block; height: .85rem; margin-bottom: .9rem; border-radius: 4px; background: var(--x-muted); opacity: .25; }
-.skeleton .placeholder.lg { height: 1.4rem; margin-bottom: 1.5rem; }
-
 #output-code {
   display: block;
   width: 100%;
-  min-height: 30rem;
-  height: 75vh;
-  max-height: 75vh;
+  min-height: 16rem;
+  height: 45vh;
+  max-height: 60vh;
   padding: 1.5rem 1.25rem;
   border: 0;
   resize: vertical;
@@ -466,53 +433,44 @@ body { -webkit-font-smoothing: antialiased; }
 #output-code:focus { outline: none; box-shadow: inset 0 0 0 2px var(--x-ink); }
 
 /* ---------- Responsive: desktop-first, mobile-friendly ---------- */
-
-/* Desktop: result pane fills the viewport; long output scrolls inside the paper. */
-@media (min-width: 992px) {
-  .workspace[data-view="result"] .paper,
-  .workspace[data-view="result"] #output-code {
-    height: calc(100vh - 12rem);
-    min-height: 28rem;
-    max-height: none;
-  }
-}
-
 /* Small screens: one page scroll (no nested scroll), tighter padding. */
 @media (max-width: 767.98px) {
-  .app-header { padding-block: .5rem; }
   .pane { border-radius: var(--x-radius); }
   .source-pane { padding: .75rem; }
   .pane-head { padding: .5rem .5rem .5rem .75rem; gap: .5rem; }
-  .result-tools { gap: 0; }
   .scan-frame img { height: 2.25rem; max-width: 3.5rem; }
-  .paper { max-height: none; min-height: 50vh; overflow: visible; }
+  .paper { max-height: none; min-height: 12rem; overflow: visible; }
   .paper-inner { padding: 1.25rem 1rem 1.5rem; font-size: 1rem; }
   .paper-inner h1 { font-size: 1.5rem; }
   .paper-inner h2 { font-size: 1.25rem; }
-  #output-code { height: auto; min-height: 60vh; max-height: none; padding: 1rem; }
-  .notice { padding: .75rem 1rem; }
+  #output-code { height: 50vh; min-height: 12rem; padding: 1rem; }
+  .result-error { --bs-alert-padding-x: 1rem; --bs-alert-padding-y: .75rem; }
 }
 
 /* Touch: larger targets, touch wording in the drop hint. */
 .hint-touch { display: none; }
 
 @media (hover: none) and (pointer: coarse) {
-  .icon-btn { width: 2.75rem; height: 2.75rem; }
+  .btn-icon { width: 2.75rem; height: 2.75rem; }
   .hint-desktop { display: none; }
   .hint-touch { display: inline; }
 }
 
-/* ---------- Toast & tooltip ---------- */
-.toast {
-  --bs-toast-bg: var(--x-ink);
-  --bs-toast-color: var(--x-bg);
-  --bs-toast-border-width: 0;
-  border-radius: var(--x-radius);
+/* ---------- Landing page (layout is Bootstrap utilities in index.html) ---------- */
+#app, section[id] { scroll-margin-top: 1rem; }
+/* Round icon used for highlights and steps; the tooltip carries the words. */
+.chip-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--x-line);
+  border-radius: 50%;
+  background: var(--x-surface);
+  color: var(--x-ink);
 }
 
-.toast .btn-close { filter: invert(1) grayscale(1); }
-[data-bs-theme="dark"] .toast .btn-close { filter: none; }
-
+/* ---------- Tooltip ---------- */
 .tooltip {
   --bs-tooltip-bg: var(--x-ink);
   --bs-tooltip-color: var(--x-bg);

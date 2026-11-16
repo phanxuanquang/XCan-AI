@@ -1,77 +1,53 @@
 // All motion goes through Anime.js v4 (global `anime` from CDN).
-// Rule: animate only what changed because of the user, plus the scan while the model works.
+// Effects: landing blocks fade up once on scroll, the first render fades in, the live preview fades
+// in new blocks and words while the model streams, and translation scrambles the text.
 // Every effect checks prefers-reduced-motion and falls back to an instant/static state.
 
-const { animate, stagger, utils } = anime;
+const { animate, scrambleText } = anime;
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Fade an element in, rising from `y` px (pane switch, notice, first rendered output). */
-export function fadeIn(el, y = 0) {
+/** Fade an element in (first rendered output). */
+export function fadeIn(el) {
   if (reduced()) return;
-  animate(el, { opacity: [0, 1], y: [y, 0], duration: 360, ease: 'outCubic' });
+  animate(el, { opacity: [0, 1], duration: 360, ease: 'outCubic' });
 }
 
-// ---------- Status dot ----------
-let dotPulse = null;
-
-/** Pulse while loading; one pop when the state settles. */
-export function statusDot(dot, state) {
-  dotPulse?.revert();
-  dotPulse = null;
-  if (reduced()) return;
-  if (state === 'checking') {
-    dotPulse = animate(dot, { scale: [1, 1.45], opacity: [1, 0.45], duration: 650, ease: 'inOutSine', loop: true, alternate: true });
-  } else {
-    animate(dot, { scale: [1.8, 1], duration: 500, ease: 'outBack(2)' });
-  }
-}
-
-// ---------- Scan over the thumbnail ----------
-let scanAnims = [];
-
-/** Highlighter line sweeps the image; swept area tinted. Static tint when motion is reduced. */
-export function startScan(frame) {
-  stopScan();
-  const line = frame.querySelector('.scan-line');
-  const sweep = frame.querySelector('.scan-sweep');
-  // Percentages, so it works before the thumbnail has finished loading.
-  utils.set([line, sweep], { opacity: 1 });
-  if (reduced()) {
-    utils.set(sweep, { height: '100%' });
-    utils.set(line, { top: '50%' });
-    return;
-  }
-  const loop = { duration: 1300, ease: 'inOutSine', loop: true, alternate: true };
-  scanAnims = [
-    animate(line, { top: ['0%', '96%'], ...loop }),
-    animate(sweep, { height: ['0%', '100%'], ...loop }),
-  ];
-}
-
-export function stopScan(frame) {
-  scanAnims.forEach((a) => a.revert());
-  scanAnims = [];
-  if (!frame) return;
-  utils.set(frame.querySelector('.scan-line'), { opacity: 0, top: '0%' });
-  utils.set(frame.querySelector('.scan-sweep'), { opacity: 0, height: '0%' });
-}
-
-// ---------- Skeleton ----------
-let skeletonAnim = null;
-
-/** Placeholder lines breathe in sequence until the first token arrives. */
-export function skeleton(el, on) {
-  skeletonAnim?.revert();
-  skeletonAnim = null;
-  if (!on || reduced()) return;
-  skeletonAnim = animate(el.querySelectorAll('.placeholder'), {
-    opacity: [0.12, 0.38],
-    delay: stagger(90),
-    duration: 700,
-    ease: 'inOutSine',
-    loop: true,
-    alternate: true,
+/**
+ * Scramble every text run of `root` into place (animejs.com/documentation/text/scrambletext).
+ * With `loop`, it keeps scrambling (translation in progress) until the returned animation is reverted.
+ * scrambleText writes innerHTML, so only runs without HTML-significant characters are animated
+ * (model output must never become markup); code blocks stay still too.
+ */
+export function scramble(root, loop = false) {
+  if (reduced()) return null;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) =>
+      /\S/.test(n.data) && !/[<>&]/.test(n.data) && !n.parentElement.closest('pre, code')
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_REJECT,
   });
+  const runs = [];
+  for (let n; (n = walker.nextNode());) runs.push(n);
+  const spans = runs.map((n) => {
+    const span = document.createElement('span');
+    span.textContent = n.data;
+    n.replaceWith(span);
+    return span;
+  });
+  return spans.length ? animate(spans, { innerHTML: scrambleText({ ease: 'inOut(3)', duration: 900 }), loop }) : null;
+}
+
+/** Landing page: each [data-reveal] block fades up once, the first time it scrolls into view. */
+export function revealOnScroll() {
+  const blocks = document.querySelectorAll('[data-reveal]');
+  if (reduced()) return;
+  blocks.forEach((b) => (b.style.opacity = 0));
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target);
+    animate(e.target, { opacity: [0, 1], y: [16, 0], duration: 600, ease: 'outCubic' });
+  }), { threshold: 0.15 });
+  blocks.forEach((b) => io.observe(b));
 }
 
 // ---------- Live preview ----------
@@ -132,15 +108,4 @@ function fadeTail(el, offset) {
     return span;
   });
   if (spans.length) animate(spans, { opacity: [0, 1], duration: 450, ease: 'outQuad' });
-}
-
-// ---------- Feedback ----------
-
-/** Swap an icon button's glyph to a check mark with a small pop, then restore. */
-export function confirmIcon(button, glyph = 'check') {
-  const icon = button.querySelector('.material-symbols-rounded');
-  const original = icon.textContent;
-  icon.textContent = glyph;
-  if (!reduced()) animate(icon, { scale: [0.4, 1], rotate: [-20, 0], duration: 420, ease: 'outBack(2.5)' });
-  setTimeout(() => { icon.textContent = original; }, 1400);
 }

@@ -22,8 +22,9 @@ export const renderMarkdown = (target, source, fade = false) => {
   const fresh = document.createElement('div');
   fresh.innerHTML = marked.parse(source);
   fresh.querySelectorAll('table').forEach((t) => {
+    t.className = 'table table-bordered';
     const wrap = document.createElement('div');
-    wrap.className = 'table-wrap';
+    wrap.className = 'table-responsive';
     t.replaceWith(wrap);
     wrap.append(t);
   });

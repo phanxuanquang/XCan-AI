@@ -9,6 +9,7 @@ import {
   unwrapFence,
 } from "./ocr.js";
 import { escapeText, renderMarkdown } from "./markdown.js";
+import { translateMarkdown } from "./translate.js";
 
 const MAX_SIZE = 10 * 1024 * 1024;
 
@@ -18,10 +19,8 @@ const el = {
   status: $("model-status"),
   boot: $("boot"),
   bootSpinner: $("boot-spinner"),
-  pill: $("status-pill"),
   drop: $("dropzone"),
   workspace: $("workspace"),
-  scanFrame: $("scan-frame"),
   file: $("file-input"),
   img: $("preview-image"),
   empty: $("empty-result"),
@@ -34,12 +33,12 @@ const el = {
   code: $("output-code"),
   revert: $("revert-btn"),
   copy: $("copy-btn"),
-  download: $("download-btn"),
+  translateWrap: $("translate-wrap"),
+  translate: $("translate-btn"),
+  translateMenu: $("translate-menu"),
   themeToggle: $("theme-toggle"),
-  loading: $("loading"),
   loadingText: $("loading-text"),
-  loadingTime: $("loading-time"),
-  skeleton: $("preview-skeleton"),
+  loader: $("preview-loader"),
   info: $("info-dialog"),
   infoTitle: $("info-title"),
   infoBody: $("info-body"),
@@ -52,13 +51,13 @@ const state = {
   image: null, // File
   imageUrl: null, // object URL for preview
   original: "", // last generated Markdown
+  translation: null, // translated Markdown shown in the Preview; the Edit tab keeps the source
   controller: null, // AbortController of running generation
 };
 
 // ---------- Helpers ----------
-const toast = (message) => {
-  $("toast-body").textContent = message;
-  bootstrap.Toast.getOrCreateInstance($("toast")).show();
+const dropError = (message) => {
+  $("drop-error").textContent = message;
 };
 
 const showError = (message) => {
@@ -67,6 +66,7 @@ const showError = (message) => {
 };
 
 const busy = () => state.controller !== null;
+const previewText = () => state.translation ?? el.code.value;
 
 const refreshButtons = () => {
   el.generate.disabled = !provider?.isReady || !state.image || busy();
@@ -75,9 +75,12 @@ const refreshButtons = () => {
   el.file.disabled = busy();
   el.revert.classList.toggle(
     "d-none",
-    !state.original || el.code.value === state.original,
+    !state.original ||
+      (el.code.value === state.original && state.translation === null),
   );
-  el.copy.disabled = el.download.disabled = !el.code.value.trim() || busy();
+  el.copy.disabled =
+    el.translate.disabled =
+      !el.code.value.trim() || busy();
 };
 
 // Tooltips for every element with data-bs-title; setTip keeps tooltip and aria-label in sync.
@@ -95,61 +98,37 @@ const setTip = (node, text) => {
     });
 };
 
-// Header dot always shows the model state ('checking' | 'action' | 'blocked' | 'ready').
-// Until 'ready', the boot screen explains what is happening and the workspace stays hidden.
-const setStatus = (dotState, dotText, boot = null) => {
-  if (el.pill.dataset.state !== dotState)
-    motion.statusDot(el.pill.querySelector(".dot"), dotState);
-  el.pill.dataset.state = dotState;
-  setTip(el.pill, dotText);
-  el.bootSpinner.classList.toggle("d-none", dotState !== "checking");
-  if (boot) {
-    el.status.innerHTML = `${boot.icon ? `<span class="material-symbols-rounded" aria-hidden="true">${boot.icon}</span>` : ""}
-      <div>${boot.html}</div>${boot.extra || ""}`;
-    motion.fadeIn(el.status, 6);
-  }
-  if (dotState !== "ready") return;
+// Boot screen: covers the app until the model session is ready (spinner only while working).
+const setBoot = ({ busy = false, icon, html, extra = "" }) => {
+  el.bootSpinner.classList.toggle("d-none", !busy);
+  el.status.innerHTML = `${icon ? `<span class="material-symbols-rounded" aria-hidden="true">${icon}</span>` : ""}
+      <div>${html}</div>${extra}`;
+};
+const showWorkspace = () => {
   el.boot.hidden = true;
   el.workspace.hidden = false;
-  motion.fadeIn(el.workspace, 14);
 };
 
 // Workspace shows only the drop pane ('input') or only the live preview ('result').
 const setView = (view) => {
   if (el.workspace.dataset.view === view) return;
   el.workspace.dataset.view = view;
-  motion.fadeIn(view === "result" ? el.output : el.drop.closest(".pane"), 14);
+  // The tool sits under the landing hero: bring the live preview into view.
+  if (view === "result")
+    $("app").scrollIntoView({
+      block: "start",
+      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
   bootstrap.Tooltip.getInstance(el.clear)?.hide();
 };
 
-// Result pane shows one of: empty hint, skeleton (waiting for first token), rendered Markdown.
+// Result pane shows one of: empty hint, ring loader (waiting for the first token), rendered Markdown.
 const showResult = (view) => {
   if (view === "rendered" && el.rendered.classList.contains("d-none"))
     motion.fadeIn(el.rendered);
-  motion.skeleton(el.skeleton, view === "skeleton");
   el.empty.classList.toggle("d-none", view !== "empty");
-  el.skeleton.classList.toggle("d-none", view !== "skeleton");
+  el.loader.classList.toggle("d-none", view !== "loading");
   el.rendered.classList.toggle("d-none", view !== "rendered");
-};
-
-// Loading: highlighter scan over the image, progress line with elapsed time, spinner on the button.
-let loadingTimer = null;
-const setLoading = (on, label = "") => {
-  if (on) motion.startScan(el.scanFrame);
-  else motion.stopScan(el.scanFrame);
-  el.loading.classList.toggle("d-none", !on);
-  el.generate.querySelector(".spinner-border").classList.toggle("d-none", !on);
-  el.generate
-    .querySelector(".material-symbols-rounded")
-    .classList.toggle("d-none", on);
-  clearInterval(loadingTimer);
-  if (!on) return;
-  el.loadingText.textContent = label;
-  const t0 = Date.now();
-  el.loadingTime.textContent = "0 s";
-  loadingTimer = setInterval(() => {
-    el.loadingTime.textContent = `${Math.floor((Date.now() - t0) / 1000)} s`;
-  }, 1000);
 };
 
 // ---------- Model availability & download ----------
@@ -180,16 +159,14 @@ function showInfo({ title, md, docs, confirm, onConfirm }) {
 
 /** Boot screen keeps a short line + a button; the details live in the dialog, opened right away. */
 function needsUser(
-  dotState,
-  dotText,
   help,
   { icon, docs = provider.docs, confirm, onConfirm } = {},
 ) {
   const open = () => showInfo({ ...help, docs, confirm, onConfirm });
-  setStatus(dotState, dotText, {
+  setBoot({
     icon,
     html: `<strong>${escapeText(help.title)}</strong>`,
-    extra: `<button id="boot-action" class="btn-ink" type="button">${confirm ? "Download model" : "Read more"}</button>`,
+    extra: `<button id="boot-action" class="btn btn-ink" type="button">${confirm ? "Download model" : "Read more"}</button>`,
   });
   $("boot-action").addEventListener("click", open);
   open();
@@ -198,8 +175,6 @@ function needsUser(
 async function checkModel() {
   if (!provider) {
     needsUser(
-      "blocked",
-      "Browser not supported",
       {
         title: "Open XCan in Chrome or Edge",
         md: "XCan reads images with the AI model built into **Google Chrome** or **Microsoft Edge** on a desktop computer. This browser does not have it.",
@@ -210,8 +185,6 @@ async function checkModel() {
   }
   if (!provider.isSupported()) {
     needsUser(
-      "blocked",
-      "Built-in AI is off",
       provider.setupHelp("unavailable"),
       { icon: "block" },
     );
@@ -226,8 +199,6 @@ async function checkModel() {
     availability === "downloading"
   ) {
     needsUser(
-      "action",
-      "Model download needed",
       provider.setupHelp(availability),
       {
         icon: "download",
@@ -245,24 +216,24 @@ async function checkModel() {
           : `- [ ] ${label} *(cannot tell from a web page)*`,
     );
     help.md += `\n\n### Checked on this device\n\n${rows.join("\n")}`;
-    needsUser("blocked", "Device not supported", help, { icon: "memory" });
+    needsUser(help, { icon: "memory" });
   }
 }
 
 // Create the long-lived model session; with `download`, show progress while the model downloads.
 async function startSession(download = false) {
-  setStatus(
-    "checking",
-    download ? "Downloading model" : "Loading model",
+  setBoot(
     download
       ? {
+          busy: true,
           html: `<strong>Downloading the model</strong><br>Keep this tab open. This can take a while.
       <div class="progress mt-3" role="progressbar" aria-label="Model download" aria-valuemin="0" aria-valuemax="100">
         <div id="download-bar" class="progress-bar" style="width: 0%"></div>
       </div>
-      <div id="download-pct" class="download-pct" aria-live="polite">Starting download…</div>`,
+      <div id="download-pct" class="small text-body-secondary mt-2" aria-live="polite">Starting download…</div>`,
         }
       : {
+          busy: true,
           html: "<strong>Preparing XCan</strong><br>Loading the on-device model. This takes a few seconds.",
         },
   );
@@ -272,35 +243,24 @@ async function startSession(download = false) {
       download
         ? (fraction) => {
             const pct = Math.round(fraction * 100);
-            $("download-bar").style.width = `${pct}%`; // Bootstrap animates the width
-            $("download-bar").parentElement.setAttribute("aria-valuenow", pct);
+            const bar = $("download-bar");
+            const done = pct >= 100;
+            bar.style.width = `${pct}%`; // Bootstrap animates the width
+            bar.parentElement.setAttribute("aria-valuenow", pct);
             // At 100% the browser still extracts and loads the model: show an indeterminate bar
             // (developer.chrome.com/docs/ai/inform-users-of-model-download).
-            $("download-bar").classList.toggle(
-              "progress-bar-striped",
-              pct >= 100,
-            );
-            $("download-bar").classList.toggle(
-              "progress-bar-animated",
-              pct >= 100,
-            );
-            $("download-pct").textContent =
-              pct < 100
-                ? `${pct}% downloaded`
-                : "Downloaded. Extracting and loading the model…";
-            setTip(el.pill, `Downloading model ${pct}%`);
+            bar.classList.toggle("progress-bar-striped", done);
+            bar.classList.toggle("progress-bar-animated", done);
+            $("download-pct").textContent = done
+              ? "Downloaded. Extracting and loading the model…"
+              : `${pct}% downloaded`;
           }
         : undefined,
     );
-    setStatus(
-      "ready",
-      `Ready: built-in AI of ${provider.name}. Images stay on this device.`,
-    );
+    showWorkspace();
     refreshButtons();
   } catch (err) {
     needsUser(
-      "blocked",
-      "Model failed to load",
       {
         title: "The model could not be loaded",
         md: `${provider.describeError(err)}
@@ -319,17 +279,18 @@ addEventListener("pagehide", () => provider?.destroy());
 function setImage(file) {
   if (!file || !provider?.isReady) return;
   if (!file.type.startsWith("image/")) {
-    toast("This file is not an image. Choose a PNG, JPG, WEBP or GIF.");
+    dropError("This file is not an image. Choose a PNG, JPG, WEBP or GIF.");
     return;
   }
   if (file.size > MAX_SIZE) {
-    toast("This image is over 10 MB. Choose a smaller one.");
+    dropError("This image is over 10 MB. Choose a smaller one.");
     return;
   }
+  dropError("");
   if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
   state.image = file;
   state.imageUrl = URL.createObjectURL(file);
-  el.img.src = state.imageUrl;
+  el.img.src = $("image-full").src = state.imageUrl;
   setView("result");
   showError("");
   refreshButtons();
@@ -367,8 +328,8 @@ async function generate() {
   el.code.value = "";
   el.code.readOnly = true;
   el.rendered.innerHTML = "";
-  showResult("skeleton");
-  setLoading(true, "Reading the image");
+  showResult("loading");
+  el.loadingText.textContent = "Reading the image"; // announced to screen readers
   refreshButtons();
 
   try {
@@ -381,7 +342,7 @@ async function generate() {
         const text = partialJsonString(json, "markdown");
         if (!text) return;
         showResult("rendered");
-        el.loadingText.textContent = "Writing Markdown";
+        el.loadingText.textContent = "Reading the text";
         el.code.value = text;
         el.code.scrollTop = el.code.scrollHeight;
         renderMarkdown(el.rendered, text, true);
@@ -389,19 +350,14 @@ async function generate() {
     });
     const result = parseOcr(raw);
     el.code.value = result.textFound ? result.markdown : "";
-    toast(
-      result.textFound
-        ? "Converted to Markdown"
-        : "No text found in this image",
-    );
+    if (!result.textFound) showError("No text found in this image.");
   } catch (err) {
-    if (err.name === "AbortError")
-      toast("Conversion stopped. Partial result kept.");
-    else showError(provider.describeError(err));
+    if (err.name !== "AbortError") showError(provider.describeError(err));
   } finally {
-    setLoading(false);
+    el.loadingText.textContent = "";
     // Keep whatever streamed so far, even after stop/error.
     state.original = unwrapFence(el.code.value);
+    state.translation = null;
     el.code.value = state.original;
     renderMarkdown(el.rendered, state.original);
     showResult(state.original ? "rendered" : "empty");
@@ -416,9 +372,10 @@ el.stop.addEventListener("click", () => state.controller?.abort());
 
 el.clear.addEventListener("click", () => {
   if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
-  Object.assign(state, { image: null, imageUrl: null, original: "" });
+  Object.assign(state, { image: null, imageUrl: null, original: "", translation: null });
   el.file.value = "";
   el.img.removeAttribute("src");
+  $("image-full").removeAttribute("src");
   setView("input");
   el.code.value = "";
   el.rendered.innerHTML = "";
@@ -430,6 +387,7 @@ el.clear.addEventListener("click", () => {
 // ---------- Output actions ----------
 el.code.addEventListener("input", () => {
   if (busy()) return;
+  state.translation = null; // the source changed: an old translation no longer matches it
   renderMarkdown(el.rendered, el.code.value);
   showResult(el.code.value.trim() ? "rendered" : "empty");
   refreshButtons();
@@ -437,34 +395,106 @@ el.code.addEventListener("input", () => {
 
 el.revert.addEventListener("click", () => {
   el.code.value = state.original;
+  state.translation = null;
   renderMarkdown(el.rendered, state.original);
   showResult(state.original ? "rendered" : "empty");
   refreshButtons();
-  toast("Edits undone");
 });
+
+// ---------- Translation (Translator + Language Detector APIs) ----------
+const langName = (code) =>
+  new Intl.DisplayNames(["en"], { type: "language" }).of(code) ?? code;
+const nativeName = (code) =>
+  new Intl.DisplayNames([code], { type: "language" }).of(code) ?? "";
+
+function buildTranslateMenu() {
+  const items = provider.translationLanguages
+    .map((code) => ({ code, name: langName(code), native: nativeName(code) }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(
+      ({ code, name, native }) =>
+        `<li><button class="dropdown-item" type="button" data-lang="${code}" lang="${code}"><span lang="en">${escapeText(name)}</span>${native && native !== name ? `<small>${escapeText(native)}</small>` : ""}</button></li>`,
+    );
+  el.translateMenu.innerHTML = `<li><h6 class="dropdown-header">Translate to</h6></li>${items.join("")}`;
+}
+
+// The menu click is the user gesture that create() needs if a language pack must be downloaded.
+// A translation only changes the Preview: the Markdown in the Edit tab stays the source, so every
+// translation starts from it (never from an earlier translation).
+async function translateTo(target) {
+  const source = el.code.value;
+  if (!source.trim() || busy()) return;
+  state.controller = new AbortController();
+  const { signal } = state.controller;
+  showError("");
+  el.loadingText.textContent = "Detecting the language";
+  refreshButtons();
+  const working = motion.scramble(el.rendered, true); // text keeps scrambling while translating
+  let done = false;
+  try {
+    const from = await provider.detectLanguage(source);
+    if (!from) {
+      showError("Could not tell which language this text is in.");
+      return;
+    }
+    if (from === target) {
+      // Back to the source language: show the source itself instead of translating.
+      if (state.translation === null) showError(`The text is already in ${langName(target)}.`);
+      else {
+        state.translation = null;
+        done = true;
+      }
+      return;
+    }
+    const translator = await provider.createTranslator(from, target, (f) => {
+      el.loadingText.textContent = `Downloading ${langName(from)} to ${langName(target)}: ${Math.round(f * 100)}%`;
+    });
+    if (!translator) {
+      showError(`${langName(from)} to ${langName(target)} is not available in this browser.`);
+      return;
+    }
+    el.loadingText.textContent = `Translating to ${langName(target)}`;
+    el.code.readOnly = true;
+    state.translation = await translateMarkdown(source, (text) =>
+      translator.translate(text, { signal }),
+    );
+    done = true;
+  } catch (err) {
+    if (err.name !== "AbortError") showError(provider.describeError(err));
+  } finally {
+    el.loadingText.textContent = "";
+    state.controller = null;
+    el.code.readOnly = false;
+    refreshButtons();
+    // Stop the working scramble; a new translation scrambles into place.
+    working?.revert();
+    renderMarkdown(el.rendered, previewText());
+    showResult("rendered");
+    if (done) motion.scramble(el.rendered);
+  }
+}
+
+if (provider?.canTranslate()) {
+  buildTranslateMenu();
+  el.translateWrap.hidden = false;
+  el.translateMenu.addEventListener("click", (e) => {
+    const lang = e.target.closest("[data-lang]")?.dataset.lang;
+    if (!lang) return;
+    bootstrap.Dropdown.getOrCreateInstance(el.translate).hide();
+    bootstrap.Tooltip.getInstance(el.translateWrap)?.hide();
+    translateTo(lang);
+  });
+}
 
 el.copy.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(el.code.value);
-    motion.confirmIcon(el.copy);
+    const icon = el.copy.querySelector(".material-symbols-rounded");
+    icon.textContent = "check"; // brief confirmation
+    setTimeout(() => (icon.textContent = "content_copy"), 1400);
   } catch {
-    toast(
-      "Copy blocked by the browser. Select the text in the Markdown tab instead.",
-    );
+    showError("Copy blocked by the browser. Select the text in the Edit tab instead.");
   }
-});
-
-el.download.addEventListener("click", () => {
-  const url = URL.createObjectURL(
-    new Blob([el.code.value], { type: "text/markdown" }),
-  );
-  const a = Object.assign(document.createElement("a"), {
-    href: url,
-    download: "xcan-output.md",
-  });
-  a.click();
-  URL.revokeObjectURL(url);
-  motion.confirmIcon(el.download, "download_done");
 });
 
 // ---------- Theme ----------
@@ -495,4 +525,5 @@ el.themeToggle.addEventListener("click", () => {
   }
 });
 
+motion.revealOnScroll();
 checkModel();
