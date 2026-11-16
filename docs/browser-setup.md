@@ -56,6 +56,10 @@ The default model (Phi-4-mini) needs a **Device performance class** of High or a
 > [!NOTE]
 > Edge's docs describe text prompts only. XCan asks for image input, so whether it works depends on the Edge build.
 
+## Translation
+
+The translate menu uses two more built-in APIs: [Translator](https://developer.chrome.com/docs/ai/translator-api) and [Language Detector](https://developer.chrome.com/docs/ai/language-detection). Chrome's docs list them from Chrome 138 on desktop; they don't work on mobile. Edge documents the [Translator API](https://learn.microsoft.com/microsoft-edge/web-platform/translator-api) too. If a browser lacks either API, the translate icon is hidden. Language packs download on first use of each pair.
+
 ## What XCan shows when something is missing
 
 On load XCan calls `LanguageModel.availability()` with the same options it uses to prompt (text + image in, English text out):

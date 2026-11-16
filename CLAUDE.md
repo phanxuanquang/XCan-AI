@@ -12,7 +12,7 @@ No build, no package manager, no test framework. ES modules do not load from `fi
 
 ## Stack rules
 
-- Semantic HTML + vanilla JS (ES modules) + CDN libs only: Bootstrap 5.3.3, Material Symbols Rounded, Marked.js 15.0.12, Anime.js 4.4.1. Pin exact versions. No npm deps, no build step.
+- Semantic HTML + vanilla JS (ES modules) + CDN libs only: Bootstrap 5.3.9, Roboto + Roboto Mono (Google Fonts, the only fonts), Material Symbols Rounded, Marked.js 15.0.12, Anime.js 4.4.1. Pin exact versions. No npm deps, no build step.
 - The site lives in `src/` and deploys via `.github/workflows/pages.yml`. Relative paths only; it must work under a sub-path.
 
 ## AI rules
@@ -30,7 +30,7 @@ No build, no package manager, no test framework. ES modules do not load from `fi
 
 - Desktop-first, mobile-friendly. No large empty areas.
 - Minimal: icon buttons (Material Symbols) with tooltips (`data-bs-title`, kept in sync with `aria-label`).
-- Monochrome only: black, white, greys. Theme tokens live in `src/css/app.css`.
+- Monochrome only: black, white, greys. The "primary" fill is the ink colour (black in light, near-white in dark). Tokens live in `src/css/app.css`; never hard-code colors elsewhere.
 - Help/setup text is Markdown, rendered by Marked in the Bootstrap modal, with links to the official docs.
 - Animations go in `src/js/motion.js` via Anime.js, never hand-rolled; every effect honors `prefers-reduced-motion`.
 
@@ -42,5 +42,5 @@ No build, no package manager, no test framework. ES modules do not load from `fi
 
 ## Workflow
 
-- Update the matching page in `docs/` (and the history in `docs/development.md`) whenever a feature or flow changes.
+- Update the matching page in `docs/` whenever a feature or flow changes.
 - Commit only when asked.
