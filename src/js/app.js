@@ -234,7 +234,7 @@ async function startSession(download = false) {
         }
       : {
           busy: true,
-          html: "<strong>Preparing XCan</strong><br>Loading the on-device model. This takes a few seconds.",
+          html: "Preparing the model…",
         },
   );
   try {
