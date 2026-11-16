@@ -2,13 +2,7 @@
 
 Extract the text from any image (screenshot, scan, photo, handwriting), right in your browser. The layout comes out as Markdown you can edit, translate and copy.
 
-XCan reads the image with the AI model built into **Google Chrome** or **Microsoft Edge**, through the browser's [Prompt API](https://webmachinelearning.github.io/prompt-api/) (`LanguageModel`). There is no server, no account and no API key. Your images never leave your device.
-
-```mermaid
-flowchart LR
-    I["Drop, choose or paste an image"] --> M["Browser's on-device model"] --> R["Live Markdown preview"]
-    R --> A["Edit, translate or copy"]
-```
+<img width="1416" height="900" alt="image" src="https://github.com/user-attachments/assets/a55554ae-56a5-400d-83a4-6316438d0dce" />
 
 ## Quick start
 
